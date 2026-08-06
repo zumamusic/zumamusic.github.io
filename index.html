@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Zuma Music — coming soon.">
+  <title>Zuma Music — Coming Soon</title>
+  <link rel="icon" href="assets/zuma-favicon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="home" class="desktop">
+    <header class="topbar">
+      <a class="signature" href="#home" aria-label="Zuma home"><img src="assets/zuma-premier-lockup.png" alt="Zuma"></a>
+      <a class="wordmark" href="#home" aria-label="Zuma Music home"><img src="assets/zuma-music-logo.png" alt="Zuma Music"></a>
+      <nav class="nav" aria-label="Main navigation"><a href="mailto:hello@zuma.music">contact</a></nav>
+    </header>
+
+    <section class="notice-wrap" aria-label="Coming soon announcement">
+      <article class="notice-window" id="notice">
+        <div class="titlebar" id="drag-handle" tabindex="0" aria-label="Drag Zuma Notice window. Use arrow keys to move it and Escape to reset.">
+          <span class="mini-wave" aria-hidden="true"></span>
+          <span>Zuma_Socials</span>
+          <span class="mini-controls">
+            <a href="https://www.tiktok.com/@zumamusc" target="_blank" rel="noopener" aria-label="Open Zuma on TikTok"><img src="assets/window-tiktok.png" alt=""></a>
+            <a href="https://www.instagram.com/zumamusc" target="_blank" rel="noopener" aria-label="Open Zuma on Instagram"><img src="assets/window-instagram.png" alt=""></a>
+            <a href="https://x.com/zumamusc" target="_blank" rel="noopener" aria-label="Open Zuma on X"><img src="assets/window-close.png" alt=""></a>
+          </span>
+        </div>
+        <div class="notice-body">
+          <div class="sunset-art" role="img" aria-label="Four dark sculptural forms beside the ocean at sunset"></div>
+          <div class="message">
+            <h1>coming soon.</h1>
+            <p>Zuma lands in 2027.</p>
+            <p class="invite">join the waitlist.</p>
+            <form name="zuma-waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thanks.html">
+              <input type="hidden" name="form-name" value="zuma-waitlist">
+              <p class="sr-only"><label>Don’t fill this out: <input name="bot-field"></label></p>
+              <label class="sr-only" for="email">Email address</label>
+              <input id="email" name="email" type="email" placeholder="email address" autocomplete="email" required>
+              <button type="submit">join</button>
+            </form>
+          </div>
+        </div>
+        <span class="resize-grip" aria-hidden="true">///</span>
+      </article>
+    </section>
+
+    <nav class="desktop-folders" aria-label="Zuma collections">
+      <a href="https://untitled.stream/library/project/MYrlEZppGPqCRY5uA4fcw" target="_blank" rel="noopener"><img class="folder" src="assets/folder-icon.png" alt=""><span>Music</span></a>
+      <a href="https://www.youtube.com/@zumamusc" target="_blank" rel="noopener"><img class="folder" src="assets/folder-icon.png" alt=""><span>Archives</span></a>
+    </nav>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
