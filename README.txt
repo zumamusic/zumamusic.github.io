@@ -18,3 +18,5 @@ The existing links are configured for:
 
 The waitlist form uses Netlify Forms. If hosted elsewhere, connect the form to
 that provider's form service before accepting real signups.
+
+GitHub Pages deployment.
