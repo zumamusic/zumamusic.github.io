@@ -5,6 +5,17 @@
   let position = { x: 0, y: 0 };
   let drag = null;
 
+  function viewportSize() {
+    return {
+      width: window.visualViewport?.width ?? window.innerWidth,
+      height: window.visualViewport?.height ?? window.innerHeight
+    };
+  }
+
+  function dockTop(viewportHeight) {
+    return document.querySelector('.zuma-dock')?.getBoundingClientRect().top ?? viewportHeight;
+  }
+
   function applyPosition() {
     notice.style.transform = `translate3d(${position.x}px, ${position.y}px, 0)`;
   }
@@ -13,23 +24,40 @@
     const rect = notice.getBoundingClientRect();
     const baseLeft = rect.left - start.x;
     const baseTop = rect.top - start.y;
+    const viewport = viewportSize();
     return {
-      x: Math.min(Math.max(next.x, 80 - rect.width - baseLeft), innerWidth - 80 - baseLeft),
-      y: Math.min(Math.max(next.y, 12 - baseTop), innerHeight - 39 - baseTop)
+      x: Math.min(Math.max(next.x, 80 - rect.width - baseLeft), viewport.width - 80 - baseLeft),
+      y: Math.min(Math.max(next.y, 12 - baseTop), dockTop(viewport.height) - 39 - baseTop)
     };
   }
 
   controls.addEventListener('pointerdown', event => event.stopPropagation());
   titlebar.addEventListener('pointerdown', event => {
     if (event.button !== 0 || event.target.closest('.mini-controls')) return;
-    drag = { pointerX: event.clientX, pointerY: event.clientY, startX: position.x, startY: position.y };
+    const rect = notice.getBoundingClientRect();
+    const viewport = viewportSize();
+    const baseLeft = rect.left - position.x;
+    const baseTop = rect.top - position.y;
+    drag = {
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+      startX: position.x,
+      startY: position.y,
+      minX: 80 - rect.width - baseLeft,
+      maxX: viewport.width - 80 - baseLeft,
+      minY: 12 - baseTop,
+      maxY: dockTop(viewport.height) - 39 - baseTop
+    };
     notice.classList.add('is-dragging');
     titlebar.setPointerCapture(event.pointerId);
     event.preventDefault();
   });
   titlebar.addEventListener('pointermove', event => {
     if (!drag || !titlebar.hasPointerCapture(event.pointerId)) return;
-    position = constrain({ x: drag.startX + event.clientX - drag.pointerX, y: drag.startY + event.clientY - drag.pointerY }, { x: drag.startX, y: drag.startY });
+    position = {
+      x: Math.min(Math.max(drag.startX + event.clientX - drag.pointerX, drag.minX), drag.maxX),
+      y: Math.min(Math.max(drag.startY + event.clientY - drag.pointerY, drag.minY), drag.maxY)
+    };
     applyPosition();
   });
   function stop(event) {

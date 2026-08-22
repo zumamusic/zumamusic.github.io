@@ -282,6 +282,10 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid 
 
 @media (max-height: 500px) and (orientation: landscape) and (hover: none) {
   :root { --dock-height: clamp(42px, 11vh, 52px); }
+  .notice-window {
+    scale: .7;
+    transform-origin: top center;
+  }
   .homepage-rainwave {
     left: 50%;
     top: 34vh;
