@@ -1,21 +1,62 @@
 (() => {
-  const windowEl = document.querySelector('#notice');
-  const handle = document.querySelector('#drag-handle');
-  if (!windowEl || !handle || matchMedia('(max-width: 680px)').matches) return;
-  let startX = 0, startY = 0, baseX = 0, baseY = 0, dragging = false;
-  const move = (x, y) => {
-    baseX = Math.max(-window.innerWidth * .35, Math.min(window.innerWidth * .35, x));
-    baseY = Math.max(-window.innerHeight * .3, Math.min(window.innerHeight * .3, y));
-    windowEl.style.transform = `translate(${baseX}px, ${baseY}px)`;
-  };
-  handle.addEventListener('pointerdown', e => { dragging = true; startX = e.clientX - baseX; startY = e.clientY - baseY; handle.setPointerCapture(e.pointerId); });
-  handle.addEventListener('pointermove', e => { if (dragging) move(e.clientX - startX, e.clientY - startY); });
-  handle.addEventListener('pointerup', () => dragging = false);
-  handle.addEventListener('keydown', e => {
-    if (e.key === 'Escape') move(0, 0);
-    else if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) {
-      e.preventDefault(); const n = e.shiftKey ? 20 : 5;
-      move(baseX + (e.key === 'ArrowLeft' ? -n : e.key === 'ArrowRight' ? n : 0), baseY + (e.key === 'ArrowUp' ? -n : e.key === 'ArrowDown' ? n : 0));
+  const notice = document.querySelector('#notice-window');
+  const titlebar = document.querySelector('#titlebar');
+  const controls = titlebar.querySelector('.mini-controls');
+  let position = { x: 0, y: 0 };
+  let drag = null;
+
+  function applyPosition() {
+    notice.style.transform = `translate3d(${position.x}px, ${position.y}px, 0)`;
+  }
+
+  function constrain(next, start = position) {
+    const rect = notice.getBoundingClientRect();
+    const baseLeft = rect.left - start.x;
+    const baseTop = rect.top - start.y;
+    return {
+      x: Math.min(Math.max(next.x, 80 - rect.width - baseLeft), innerWidth - 80 - baseLeft),
+      y: Math.min(Math.max(next.y, 12 - baseTop), innerHeight - 39 - baseTop)
+    };
+  }
+
+  controls.addEventListener('pointerdown', event => event.stopPropagation());
+  titlebar.addEventListener('pointerdown', event => {
+    if (event.button !== 0 || event.target.closest('.mini-controls')) return;
+    drag = { pointerX: event.clientX, pointerY: event.clientY, startX: position.x, startY: position.y };
+    notice.classList.add('is-dragging');
+    titlebar.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  titlebar.addEventListener('pointermove', event => {
+    if (!drag || !titlebar.hasPointerCapture(event.pointerId)) return;
+    position = constrain({ x: drag.startX + event.clientX - drag.pointerX, y: drag.startY + event.clientY - drag.pointerY }, { x: drag.startX, y: drag.startY });
+    applyPosition();
+  });
+  function stop(event) {
+    if (titlebar.hasPointerCapture(event.pointerId)) titlebar.releasePointerCapture(event.pointerId);
+    drag = null;
+    notice.classList.remove('is-dragging');
+  }
+  titlebar.addEventListener('pointerup', stop);
+  titlebar.addEventListener('pointercancel', stop);
+  titlebar.addEventListener('keydown', event => {
+    if (event.key === 'Escape' || event.key === 'Home') position = { x: 0, y: 0 };
+    else {
+      const amount = event.shiftKey ? 30 : 10;
+      const directions = { ArrowLeft: [-amount, 0], ArrowRight: [amount, 0], ArrowUp: [0, -amount], ArrowDown: [0, amount] };
+      if (!directions[event.key]) return;
+      const [x, y] = directions[event.key];
+      position = constrain({ x: position.x + x, y: position.y + y });
     }
+    event.preventDefault();
+    applyPosition();
+  });
+  addEventListener('resize', () => { position = constrain(position); applyPosition(); });
+
+  document.querySelector('#waitlist-form').addEventListener('submit', event => {
+    event.preventDefault();
+    if (!event.currentTarget.checkValidity()) return;
+    event.currentTarget.hidden = true;
+    document.querySelector('#form-message').hidden = false;
   });
 })();
