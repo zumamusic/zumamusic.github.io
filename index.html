@@ -15,7 +15,7 @@
   <meta name="twitter:image" content="https://zuma.music/og.png">
   <link rel="icon" href="dolphin-favicon.png">
   <link rel="apple-touch-icon" href="dolphin-favicon.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261004-contact-flow">
 </head>
 <body>
   <main class="desktop">
@@ -24,17 +24,92 @@
       <a class="wordmark" href="#home" aria-label="Zuma Music home"><img src="zuma-music-wordmark.png" alt="Zuma Music"></a>
       <nav class="nav" aria-label="Main navigation">
         <a href="https://tstack.app/zuma" target="_blank" rel="noopener noreferrer">demos</a>
-        <a href="mailto:demos@zuma.music">contact</a>
+        <button class="contact-trigger" id="contact-trigger" type="button" aria-haspopup="dialog">contact</button>
       </nav>
     </header>
 
-    <img class="homepage-rainwave" src="rainwave-homepage.png" alt="" aria-hidden="true">
+    <div class="contact-layer" id="contact-layer" hidden>
+      <section class="contact-window contact-art-window" role="dialog" aria-modal="false" aria-labelledby="contact-title">
+        <div class="contact-titlebar">
+          <h2 id="contact-title">Contact</h2>
+          <img class="contact-art-icon" src="pixel-rainwave.png" alt="">
+          <button class="contact-art-control contact-minimize" id="contact-minimize" type="button" aria-label="Minimize contact window"><img src="contact-task.png" alt=""></button>
+          <button class="contact-art-control contact-maximize" id="contact-maximize" type="button" aria-label="Maximize contact window"><img src="contact-max.png" alt=""></button>
+          <button class="contact-art-control contact-close" id="contact-close" type="button" aria-label="Close contact window"><img src="contact-x.png" alt=""></button>
+        </div>
+        <form class="contact-form contact-art-form" id="contact-form" action="https://formsubmit.co/ajax/demos@zuma.music" method="POST">
+            <input type="hidden" name="_subject" value="New message from zuma.music">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_captcha" value="false">
+            <label for="contact-name">Name:</label>
+            <input id="contact-name" name="name" type="text" required autocomplete="name">
+            <label for="contact-message">Message:</label>
+            <textarea id="contact-message" name="message" required></textarea>
+            <label for="contact-email">Email:</label>
+            <input id="contact-email" name="email" type="email" required autocomplete="email">
+            <div class="contact-honeypot" aria-hidden="true">
+              <label for="contact-company">Company:</label>
+              <input id="contact-company" name="_honey" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <p class="contact-status" id="contact-status" role="status" aria-live="polite"></p>
+            <button class="contact-send" type="submit" aria-label="Send message"><img src="contact-send.png" alt=""></button>
+        </form>
+        <div class="contact-thankyou" id="contact-thankyou" role="status" aria-live="polite" hidden>
+          <span>Thank you.</span>
+          <small>Your message has been sent.</small>
+        </div>
+        <button class="window-resize-handle contact-resize-grip" type="button" aria-label="Resize contact window"></button>
+      </section>
+    </div>
 
-    <section class="notice-wrap" id="home" aria-label="Coming soon announcement">
+    <div class="archives-layer" id="archives-layer" hidden>
+      <section class="archives-window" id="archives-window" role="dialog" aria-modal="false" aria-labelledby="archives-title">
+        <div class="archives-titlebar">
+          <img src="dock-archives.png" alt="" class="archives-title-icon">
+          <h2 id="archives-title">Archives</h2>
+          <div class="archives-window-controls">
+            <button id="archives-minimize" type="button" aria-label="Minimize archives window"><span class="archives-minimize-glyph" aria-hidden="true"></span></button>
+            <button id="archives-maximize" type="button" aria-label="Maximize archives window"><span class="archives-maximize-glyph" aria-hidden="true"></span></button>
+            <button id="archives-close" type="button" aria-label="Close archives window"><img src="window-close.png" alt=""></button>
+          </div>
+        </div>
+        <div class="archives-toolbar">
+          <span class="archives-toolbar-label">Address</span>
+          <span class="archives-address" id="archives-address">LA_Archives</span>
+        </div>
+        <div class="archives-explorer">
+          <nav class="archives-tree" aria-label="Archive folders">
+            <div class="archives-tree-root">
+              <button id="archives-root-toggle" class="archives-tree-toggle" type="button" aria-label="Expand LA Archives" aria-expanded="false">+</button>
+              <button id="archives-root-select" class="archives-tree-folder" type="button" data-folder="root"><img src="archive-folder.png" alt="">LA_Archives</button>
+            </div>
+            <div id="archives-tree-children" class="archives-tree-children" hidden></div>
+          </nav>
+          <div class="archives-content">
+            <div class="archives-content-heading"><span id="archives-current-folder">LA_Archives</span><span id="archives-item-count">1 folder</span></div>
+            <div class="archives-grid" id="archives-grid"></div>
+          </div>
+        </div>
+        <div class="archives-statusbar"><span id="archives-status">1 object</span><button class="window-resize-handle archives-status-grip" type="button" aria-label="Resize archives window"></button></div>
+        <div class="archives-viewer" id="archives-viewer" hidden>
+          <div class="archives-viewer-top"><button id="archives-viewer-back" type="button">← Back to files</button><span id="archives-viewer-index"></span></div>
+          <div class="archives-viewer-stage">
+            <button class="archives-viewer-arrow" id="archives-prev" type="button" aria-label="Previous file">‹</button>
+            <div class="archives-viewer-media" id="archives-viewer-media"></div>
+            <button class="archives-viewer-arrow" id="archives-next" type="button" aria-label="Next file">›</button>
+          </div>
+          <div class="archives-viewer-caption" id="archives-viewer-caption"></div>
+          <div class="archives-filmstrip" id="archives-filmstrip" aria-label="Archive files"></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="notice-wrap" id="home" aria-label="Coming soon announcement" hidden>
       <div class="notice-window" id="notice-window">
         <div class="titlebar" id="titlebar" role="button" tabindex="0" aria-label="Drag Zuma Notice window. Use arrow keys to move it and Escape to reset.">
-          <span class="mini-wave" aria-hidden="true"></span><span>Zuma_Socials</span>
+          <img class="mini-wave" src="zumapc.png" alt=""><span>Socials</span>
           <div class="mini-controls">
+            <button class="window-minimize notice-minimize" id="notice-minimize" type="button" aria-label="Minimize Socials window"><span class="archives-minimize-glyph" aria-hidden="true"></span></button>
             <a href="https://www.tiktok.com/@zumamusc" target="_blank" rel="noopener noreferrer" aria-label="Open Zuma on TikTok"><img src="window-tiktok.png" alt=""></a>
             <a href="https://www.instagram.com/zumamusc" target="_blank" rel="noopener noreferrer" aria-label="Open Zuma on Instagram"><img src="window-instagram.png" alt=""></a>
             <a href="https://x.com/zumamusc" target="_blank" rel="noopener noreferrer" aria-label="Open Zuma on X"><img src="window-close.png" alt=""></a>
@@ -54,13 +129,14 @@
             <div class="success" id="form-message" role="status" hidden>waitlist signups open soon.</div>
           </div>
         </div>
-        <div class="resize-grip" aria-hidden="true">///</div>
+        <button class="window-resize-handle resize-grip" type="button" aria-label="Resize Socials window"></button>
       </div>
     </section>
 
     <section class="desktop-folders" aria-label="Zuma collections">
-      <a href="https://untitled.stream/library/project/MYrlEZppGPqCRY5uA4fcw" target="_blank" rel="noreferrer"><img class="folder" src="folder-icon.png" alt="">Music</a>
-      <a href="https://www.youtube.com/@zumamusc" target="_blank" rel="noreferrer"><img class="folder" src="folder-icon.png" alt="">Archives</a>
+      <a class="desktop-icon music-icon" href="https://untitled.stream/library/project/MYrlEZppGPqCRY5uA4fcw" target="_blank" rel="noreferrer"><img class="folder" src="folder-icon.png" alt="">Music</a>
+      <button class="desktop-icon socials-icon" id="socials-trigger" type="button" aria-label="Open Socials window" aria-haspopup="dialog"><img src="zumapc.png" alt="">Socials</button>
+      <a class="desktop-icon youtube-icon" href="https://www.youtube.com/@zumamusc" target="_blank" rel="noreferrer"><img class="folder" src="folder-icon.png" alt="">YouTube</a>
     </section>
 
     <footer class="zuma-dock" aria-label="Zuma menu preview">
@@ -68,14 +144,19 @@
       <div class="dock-start-panel" aria-hidden="true">
         <img class="dock-start-bg" src="dock-start.png" alt=""><img class="dock-rainwave" src="dock-rainwave.png" alt=""><img class="dock-zuma-text" src="dock-zuma-text.png" alt="">
       </div>
+      <nav class="dock-tasks" aria-label="Open windows">
+        <div class="dock-task-list" id="dock-task-list" tabindex="0" aria-label="Open windows, scroll horizontally for more"></div>
+      </nav>
       <div class="dock-task-area">
         <img class="dock-task-bg" src="dock-taskbar.png" alt="">
         <div class="dock-icons" aria-label="Future Zuma sections">
-          <span class="dock-item dock-sign"><img src="dock-sign.png" alt="Sign"></span><span class="dock-item"><img src="dock-archives.png" alt="Archives"></span><span class="dock-item"><img src="dock-playlist.png" alt="Playlist"></span><span class="dock-item"><img src="dock-shop.png" alt="Shop"></span><span class="dock-item"><img src="dock-about.png" alt="About"></span>
+          <span class="dock-item dock-sign"><img src="dock-sign.png" alt="Sign"></span><button class="dock-item dock-archives-trigger" id="dock-archives-trigger" type="button" aria-label="Open Archives window" aria-haspopup="dialog"><img src="dock-archives.png" alt=""></button><span class="dock-item"><img src="dock-playlist.png" alt="Playlist"></span><span class="dock-item"><img src="dock-shop.png" alt="Shop"></span><span class="dock-item"><img src="dock-about.png" alt="About"></span>
         </div>
       </div>
     </footer>
   </main>
-  <script src="script.js"></script>
+  <script src="script.js?v=20261004-contact-flow"></script>
+  <script src="archives.js?v=20261004-archive-root"></script>
+  <script src="window-controls.js?v=20261004-contact-flow"></script>
 </body>
 </html>
