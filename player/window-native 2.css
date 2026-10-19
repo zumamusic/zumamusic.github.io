@@ -1,0 +1,75 @@
+/* Generated from Webamp 2.3.1: palette changes only. */
+#webamp .playlist-top-left-fill { background-image: url('/zuma-chrome/native-0.png') !important; }
+#webamp .playlist-top-left-spacer { background-image: url('/zuma-chrome/native-1.png') !important; }
+#webamp .playlist-top-right-fill { background-image: url('/zuma-chrome/native-2.png') !important; }
+#webamp .playlist-top-right-spacer { background-image: url('/zuma-chrome/native-3.png') !important; }
+#webamp .playlist-top-left { background-image: url('/zuma-chrome/native-4.png') !important; }
+#webamp .playlist-top-title { background-image: url('/zuma-chrome/native-5.png') !important; }
+#webamp .playlist-top-right { background-image: url('/zuma-chrome/native-6.png') !important; }
+#webamp .selected .playlist-top-left-fill { background-image: url('/zuma-chrome/native-7.png') !important; }
+#webamp .selected .playlist-top-left-spacer { background-image: url('/zuma-chrome/native-8.png') !important; }
+#webamp .selected .playlist-top-right-fill { background-image: url('/zuma-chrome/native-9.png') !important; }
+#webamp .selected .playlist-top-right-spacer { background-image: url('/zuma-chrome/native-10.png') !important; }
+#webamp .selected .playlist-top-left { background-image: url('/zuma-chrome/native-11.png') !important; }
+#webamp .selected .playlist-top-title { background-image: url('/zuma-chrome/native-12.png') !important; }
+#webamp .selected .playlist-top-right { background-image: url('/zuma-chrome/native-13.png') !important; }
+#webamp .playlist-middle-left { background-image: url('/zuma-chrome/native-14.png') !important; }
+#webamp .playlist-middle-right { background-image: url('/zuma-chrome/native-15.png') !important; }
+#webamp .playlist-middle-right.winamp-active .playlist-scrollbar-handle { background-image: url('/zuma-chrome/native-16.png') !important; }
+#webamp .playlist-bottom { background-image: url('/zuma-chrome/native-17.png') !important; }
+#webamp .playlist-bottom-left { background-image: url('/zuma-chrome/native-18.png') !important; }
+#webamp .playlist-bottom-right { background-image: url('/zuma-chrome/native-19.png') !important; }
+#webamp .playlist-visualizer { background-image: url('/zuma-chrome/native-20.png') !important; }
+#webamp #playlist-window-shade { background-image: url('/zuma-chrome/native-21.png') !important; }
+#webamp #playlist-window-shade .left { background-image: url('/zuma-chrome/native-22.png') !important; }
+#webamp #playlist-window-shade .right { background-image: url('/zuma-chrome/native-23.png') !important; }
+#webamp #playlist-window-shade.selected .right { background-image: url('/zuma-chrome/native-24.png') !important; }
+#webamp #playlist-window-shade #playlist-shade-button.winamp-active { background-image: url('/zuma-chrome/native-25.png') !important; }
+#webamp .gen-window .gen-top { background-image: url('/zuma-chrome/native-26.png') !important; }
+#webamp .gen-window .gen-top-left { background-image: url('/zuma-chrome/native-27.png') !important; }
+#webamp .gen-window .gen-top-left-end { background-image: url('/zuma-chrome/native-28.png') !important; }
+#webamp .gen-window .gen-top-right { background-image: url('/zuma-chrome/native-29.png') !important; }
+#webamp .gen-window .gen-top-right-end { background-image: url('/zuma-chrome/native-30.png') !important; }
+#webamp .gen-window .gen-top-left-fill { background-image: url('/zuma-chrome/native-31.png') !important; }
+#webamp .gen-window .gen-top-right-fill { background-image: url('/zuma-chrome/native-32.png') !important; }
+#webamp .gen-window.selected .gen-top { background-image: url('/zuma-chrome/native-33.png') !important; }
+#webamp .gen-window.selected .gen-top-left { background-image: url('/zuma-chrome/native-34.png') !important; }
+#webamp .gen-window.selected .gen-top-left-end { background-image: url('/zuma-chrome/native-35.png') !important; }
+#webamp .gen-window.selected .gen-top-right { background-image: url('/zuma-chrome/native-36.png') !important; }
+#webamp .gen-window.selected .gen-top-right-end { background-image: url('/zuma-chrome/native-37.png') !important; }
+#webamp .gen-window.selected .gen-top-left-fill { background-image: url('/zuma-chrome/native-38.png') !important; }
+#webamp .gen-window.selected .gen-top-right-fill { background-image: url('/zuma-chrome/native-39.png') !important; }
+#webamp .gen-window .gen-bottom-left { background-image: url('/zuma-chrome/native-40.png') !important; }
+#webamp .gen-window .gen-bottom-right { background-image: url('/zuma-chrome/native-41.png') !important; }
+#webamp .gen-window .gen-bottom { background-image: url('/zuma-chrome/native-42.png') !important; }
+#webamp .gen-window .gen-middle-left { background-image: url('/zuma-chrome/native-43.png') !important; }
+#webamp .gen-window .gen-middle-left-bottom { background-image: url('/zuma-chrome/native-44.png') !important; }
+#webamp .gen-window .gen-middle-right { background-image: url('/zuma-chrome/native-45.png') !important; }
+#webamp .gen-window .gen-middle-right-bottom { background-image: url('/zuma-chrome/native-46.png') !important; }
+#webamp .gen-window .gen-close.winamp-active { background-image: url('/zuma-chrome/native-47.png') !important; }
+#webamp .gen-window.selected .gen-text-a { background-image: url('/zuma-chrome/native-48.png') !important; }
+#webamp .gen-window.selected .gen-text-b { background-image: url('/zuma-chrome/native-49.png') !important; }
+#webamp .gen-window.selected .gen-text-c { background-image: url('/zuma-chrome/native-50.png') !important; }
+#webamp .gen-window.selected .gen-text-d { background-image: url('/zuma-chrome/native-51.png') !important; }
+#webamp .gen-window.selected .gen-text-e { background-image: url('/zuma-chrome/native-52.png') !important; }
+#webamp .gen-window.selected .gen-text-f { background-image: url('/zuma-chrome/native-53.png') !important; }
+#webamp .gen-window.selected .gen-text-g { background-image: url('/zuma-chrome/native-54.png') !important; }
+#webamp .gen-window.selected .gen-text-h { background-image: url('/zuma-chrome/native-55.png') !important; }
+#webamp .gen-window.selected .gen-text-i { background-image: url('/zuma-chrome/native-56.png') !important; }
+#webamp .gen-window.selected .gen-text-j { background-image: url('/zuma-chrome/native-57.png') !important; }
+#webamp .gen-window.selected .gen-text-k { background-image: url('/zuma-chrome/native-58.png') !important; }
+#webamp .gen-window.selected .gen-text-l { background-image: url('/zuma-chrome/native-59.png') !important; }
+#webamp .gen-window.selected .gen-text-m { background-image: url('/zuma-chrome/native-60.png') !important; }
+#webamp .gen-window.selected .gen-text-n { background-image: url('/zuma-chrome/native-61.png') !important; }
+#webamp .gen-window.selected .gen-text-o { background-image: url('/zuma-chrome/native-62.png') !important; }
+#webamp .gen-window.selected .gen-text-p { background-image: url('/zuma-chrome/native-63.png') !important; }
+#webamp .gen-window.selected .gen-text-q { background-image: url('/zuma-chrome/native-64.png') !important; }
+#webamp .gen-window.selected .gen-text-r { background-image: url('/zuma-chrome/native-65.png') !important; }
+#webamp .gen-window.selected .gen-text-s { background-image: url('/zuma-chrome/native-66.png') !important; }
+#webamp .gen-window.selected .gen-text-t { background-image: url('/zuma-chrome/native-67.png') !important; }
+#webamp .gen-window.selected .gen-text-u { background-image: url('/zuma-chrome/native-68.png') !important; }
+#webamp .gen-window.selected .gen-text-v { background-image: url('/zuma-chrome/native-69.png') !important; }
+#webamp .gen-window.selected .gen-text-w { background-image: url('/zuma-chrome/native-70.png') !important; }
+#webamp .gen-window.selected .gen-text-x { background-image: url('/zuma-chrome/native-71.png') !important; }
+#webamp .gen-window.selected .gen-text-y { background-image: url('/zuma-chrome/native-72.png') !important; }
+#webamp .gen-window.selected .gen-text-z { background-image: url('/zuma-chrome/native-73.png') !important; }
