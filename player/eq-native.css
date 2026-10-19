@@ -1,0 +1,27 @@
+/* Generated from Webamp 2.3.1: color changes only. */
+#webamp #equalizer-window:not(.shade) { background-image: url('/zuma-eq/native-0.png') !important; }
+#webamp #equalizer-window .equalizer-top { background-image: url('/zuma-eq/native-1.png') !important; }
+#webamp #equalizer-window.selected .equalizer-top { background-image: url('/zuma-eq/native-2.png') !important; }
+#webamp #equalizer-window .band { background-image: url('/zuma-eq/native-3.png') !important; }
+#webamp #equalizer-window .band .slider-handle { background-image: url('/zuma-eq/native-4.png') !important; }
+#webamp #equalizer-window .band.winamp-active .slider-handle { background-image: url('/zuma-eq/native-5.png') !important; }
+#webamp #equalizer-window #on { background-image: url('/zuma-eq/native-6.png') !important; }
+#webamp #equalizer-window #on.winamp-active { background-image: url('/zuma-eq/native-7.png') !important; }
+#webamp #equalizer-window #on.selected { background-image: url('/zuma-eq/native-8.png') !important; }
+#webamp #equalizer-window #on.selected.winamp-active { background-image: url('/zuma-eq/native-9.png') !important; }
+#webamp #equalizer-window #auto { background-image: url('/zuma-eq/native-10.png') !important; }
+#webamp #equalizer-window #auto.winamp-active { background-image: url('/zuma-eq/native-11.png') !important; }
+#webamp #equalizer-window #auto.selected { background-image: url('/zuma-eq/native-12.png') !important; }
+#webamp #equalizer-window #auto.selected.winamp-active { background-image: url('/zuma-eq/native-13.png') !important; }
+#webamp #equalizer-window #eqGraph { background-image: url('/zuma-eq/native-14.png') !important; }
+#webamp #equalizer-window #presets { background-image: url('/zuma-eq/native-15.png') !important; }
+#webamp #equalizer-window #presets.winamp-active { background-image: url('/zuma-eq/native-16.png') !important; }
+#webamp #equalizer-window #preamp-line { background-image: url('/zuma-eq/native-17.png') !important; }
+#webamp #equalizer-window.shade { background-image: url('/zuma-eq/native-18.png') !important; }
+#webamp #equalizer-window.shade.selected { background-image: url('/zuma-eq/native-19.png') !important; }
+#webamp #equalizer-window #equalizer-shade.winamp-active { background-image: url('/zuma-eq/native-20.png') !important; }
+#webamp #equalizer-window.shade #equalizer-shade.winamp-active { background-image: url('/zuma-eq/native-21.png') !important; }
+#webamp #equalizer-window.selected #eq-buttons.clicked #equalizer-close { background-image: url('/zuma-eq/native-22.png') !important; }
+#webamp #equalizer-window.selected #eq-buttons.clicked #equalizer-close.winamp-active { background-image: url('/zuma-eq/native-23.png') !important; }
+#webamp #equalizer-window.shade.selected #eq-buttons.clicked #equalizer-close { background-image: url('/zuma-eq/native-24.png') !important; }
+#webamp #equalizer-window.shade.selected #eq-buttons.clicked #equalizer-close.winamp-active { background-image: url('/zuma-eq/native-25.png') !important; }

@@ -1,3 +1,5 @@
+import { installArchiveSwipe } from './archives-gestures.mjs';
+
 (() => {
   const mediaBase = 'archive-media/archives-1/';
 
@@ -30,62 +32,109 @@
   const rootSelect = document.querySelector('#archives-root-select');
   const treeChildren = document.querySelector('#archives-tree-children');
   const grid = document.querySelector('#archives-grid');
+  const content = document.querySelector('.archives-content');
   const viewer = document.querySelector('#archives-viewer');
   const explorer = document.querySelector('.archives-explorer');
   const viewerMedia = document.querySelector('#archives-viewer-media');
   const filmstrip = document.querySelector('#archives-filmstrip');
+  let viewMode = 'dropdown';
   let currentFolder = 'root';
+  const viewStates = {
+    dropdown: { folder: 'root', expanded: false },
+    folder: { folder: 'root', expanded: false }
+  };
   let currentIndex = 0;
   let lastMediaButton = null;
 
+  const rootName = () => viewMode === 'folder' ? 'LA_Archives' : 'Zuma_Archives';
   const activeCollection = () => collections.find(folder => folder.id === currentFolder);
 
   function setRootExpanded(expanded) {
     treeChildren.hidden = !expanded;
     rootToggle.textContent = expanded ? '−' : '+';
     rootToggle.setAttribute('aria-expanded', String(expanded));
-    rootToggle.setAttribute('aria-label', `${expanded ? 'Collapse' : 'Expand'} LA Archives`);
+    rootToggle.setAttribute('aria-label', `${expanded ? 'Collapse' : 'Expand'} ${rootName().replace('_', ' ')}`);
   }
 
   function renderTree() {
+    // Detach shared content before replacing either tree's markup.
+    explorer.append(content);
+    rootSelect.innerHTML = viewMode === 'folder'
+      ? '<img src="dock-archives.png" alt="">'
+      : '<span class="archives-folder-icon" aria-hidden="true"></span>';
+    rootSelect.append(document.createTextNode(rootName()));
     treeChildren.replaceChildren();
     collections.forEach(folder => {
+      if (viewMode === 'folder') {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'archives-tree-folder archives-tree-child';
+        button.dataset.folder = folder.id;
+        button.innerHTML = '<img src="dock-archives.png" alt="">';
+        button.append(document.createTextNode(folder.name));
+        button.addEventListener('click', () => selectFolder(folder.id));
+        treeChildren.append(button);
+        return;
+      }
+      const branch = document.createElement('div');
+      branch.className = 'archives-branch';
+      branch.dataset.folder = folder.id;
+      const row = document.createElement('div');
+      row.className = 'archives-branch-row';
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'archives-tree-toggle';
+      toggle.addEventListener('click', () => selectFolder(viewMode === 'dropdown' && currentFolder === folder.id ? 'root' : folder.id));
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'archives-tree-folder archives-tree-child';
       button.dataset.folder = folder.id;
-      button.innerHTML = '<img src="archive-folder.png" alt="">';
+      button.innerHTML = '<span class="archives-folder-icon" aria-hidden="true"></span>';
       button.append(document.createTextNode(folder.name));
-      button.addEventListener('click', () => selectFolder(folder.id));
-      treeChildren.append(button);
+      button.addEventListener('click', () => selectFolder(viewMode === 'dropdown' && currentFolder === folder.id ? 'root' : folder.id));
+      row.append(toggle, button);
+      branch.append(row);
+      treeChildren.append(branch);
     });
     updateTreeSelection();
   }
 
   function updateTreeSelection() {
     windowEl.querySelectorAll('.archives-tree-folder').forEach(button => {
-      const active = button.dataset.folder === currentFolder;
+      const active = viewMode === 'folder' && button.dataset.folder === currentFolder;
       button.classList.toggle('is-selected', active);
       if (active) button.setAttribute('aria-current', 'page');
       else button.removeAttribute('aria-current');
     });
+    treeChildren.querySelectorAll('.archives-branch').forEach(branch => {
+      const folder = collections.find(item => item.id === branch.dataset.folder);
+      const expanded = folder.id === currentFolder;
+      branch.classList.toggle('is-expanded', expanded);
+      const toggle = branch.querySelector('.archives-tree-toggle');
+      toggle.textContent = expanded ? '−' : '+';
+      toggle.setAttribute('aria-expanded', String(expanded));
+      toggle.setAttribute('aria-label', `${expanded ? 'Collapse' : 'Expand'} ${folder.name}`);
+      branch.querySelector('.archives-tree-folder').setAttribute('aria-expanded', String(expanded));
+      if (expanded && viewMode === 'dropdown') branch.append(content);
+    });
+    if (viewMode === 'folder') explorer.append(content);
+    content.hidden = viewMode === 'dropdown' && currentFolder === 'root';
   }
 
   function renderContent() {
     grid.replaceChildren();
     const folder = activeCollection();
-    document.querySelector('#archives-current-folder').textContent = folder?.name ?? 'LA_Archives';
-    document.querySelector('#archives-address').textContent = folder ? `LA_Archives / ${folder.name}` : 'LA_Archives';
+    document.querySelector('#archives-current-folder').textContent = folder?.name ?? rootName();
+    document.querySelector('#archives-address').textContent = folder ? `${rootName()} / ${folder.name}` : rootName();
     const count = folder ? folder.files.length : collections.length;
     document.querySelector('#archives-item-count').textContent = `${count} ${folder ? (count === 1 ? 'file' : 'files') : (count === 1 ? 'folder' : 'folders')}`;
-    document.querySelector('#archives-status').textContent = `${count} object${count === 1 ? '' : 's'}`;
 
     if (!folder) {
       collections.forEach(collection => {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'archives-folder-card';
-        button.innerHTML = '<img src="archive-folder.png" alt="">';
+        button.innerHTML = '<img src="dock-archives.png" alt="">';
         const label = document.createElement('span');
         label.textContent = collection.name;
         button.append(label);
@@ -157,6 +206,7 @@
       const image = document.createElement('img');
       image.src = file.src;
       image.alt = file.name;
+      image.draggable = false;
       viewerMedia.append(image);
     }
 
@@ -186,9 +236,24 @@
     filmstrip.children[currentIndex]?.scrollIntoView({ block: 'nearest', inline: 'center' });
   }
 
+  // Follow the explorer's real bounds in both modes, including the address bar.
+  function positionViewer() {
+    if (layer.hidden) return;
+    Object.assign(viewer.style, {
+      top: `${explorer.offsetTop}px`, left: `${explorer.offsetLeft}px`,
+      width: `${explorer.offsetWidth}px`, height: `${explorer.offsetHeight}px`,
+      right: 'auto', bottom: 'auto'
+    });
+  }
+  const viewerLayoutObserver = new ResizeObserver(positionViewer);
+  viewerLayoutObserver.observe(explorer);
+  viewerLayoutObserver.observe(windowEl);
+
   function openViewer(index) {
+    resetSwipe();
     currentIndex = index;
     viewer.hidden = false;
+    positionViewer();
     explorer.inert = true;
     renderViewer(activeCollection().files[index].type === 'video');
     document.querySelector('#archives-viewer-back').focus();
@@ -196,6 +261,7 @@
 
   function closeViewer(restoreFocus = true) {
     if (viewer.hidden) return;
+    resetSwipe();
     viewerMedia.querySelector('video')?.pause();
     viewer.hidden = true;
     explorer.inert = false;
@@ -210,20 +276,17 @@
     renderViewer(autoplayVideo);
   }
 
+  const resetSwipe = installArchiveSwipe(viewerMedia, direction => showMedia(currentIndex + direction), () => !viewer.hidden && !layer.hidden);
+
   function openArchives() {
     window.ZumaWindowManager?.open('archives');
     renderContent();
-    requestAnimationFrame(() => document.querySelector('#archives-close').focus());
   }
 
   function closeArchives() {
     closeViewer(false);
     window.ZumaWindowManager?.close('archives');
-    currentFolder = 'root';
-    setRootExpanded(false);
-    updateTreeSelection();
-    renderContent();
-    dockButton.focus();
+    window.ZumaWindowManager?.restoreFocus(dockButton);
   }
 
   rootToggle.addEventListener('click', () => {
@@ -231,7 +294,10 @@
     setRootExpanded(expanded);
     if (!expanded) selectFolder('root');
   });
-  rootSelect.addEventListener('click', () => selectFolder('root'));
+  rootSelect.addEventListener('click', () => {
+    if (viewMode === 'dropdown') setRootExpanded(true);
+    selectFolder('root');
+  });
   dockButton.addEventListener('click', openArchives);
   document.querySelector('#archives-close').addEventListener('click', closeArchives);
   document.querySelector('#archives-maximize').addEventListener('click', () => {
@@ -246,13 +312,11 @@
   document.querySelector('#archives-viewer-back').addEventListener('click', () => closeViewer());
   document.querySelector('#archives-prev').addEventListener('click', () => showMedia(currentIndex - 1));
   document.querySelector('#archives-next').addEventListener('click', () => showMedia(currentIndex + 1));
-  layer.addEventListener('pointerdown', event => {
-    if (event.target === layer) closeArchives();
-  });
   document.addEventListener('keydown', event => {
     if (layer.hidden || !window.ZumaWindowManager?.isActive('archives')) return;
     if (event.key === 'Escape') {
       event.preventDefault();
+      event.stopImmediatePropagation();
       if (viewer.hidden) closeArchives();
       else closeViewer();
       return;
@@ -264,6 +328,27 @@
     }
   });
 
+  const menus = windowEl.querySelectorAll('.archives-menubar details');
+  menus.forEach(menu => menu.addEventListener('toggle', () => {
+    if (menu.open) menus.forEach(other => { if (other !== menu) other.open = false; });
+  }));
+  document.addEventListener('pointerdown', event => {
+    if (!event.target.closest('.archives-menubar')) menus.forEach(menu => { menu.open = false; });
+  });
+  windowEl.querySelectorAll('[data-archive-view]').forEach(button => button.addEventListener('click', () => {
+    closeViewer(false);
+    viewStates[viewMode] = { folder: currentFolder, expanded: !treeChildren.hidden };
+    viewMode = button.dataset.archiveView;
+    windowEl.dataset.view = viewMode;
+    windowEl.querySelectorAll('[data-archive-view]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.archiveView === viewMode)));
+    menus.forEach(menu => { menu.open = false; });
+    currentFolder = viewStates[viewMode].folder;
+    renderTree();
+    setRootExpanded(viewStates[viewMode].expanded);
+    selectFolder(currentFolder);
+  }));
+  windowEl.dataset.view = viewMode;
   renderTree();
+  setRootExpanded(false);
   renderContent();
 })();

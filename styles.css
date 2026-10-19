@@ -102,11 +102,11 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   place-items: center;
   padding: clamp(1rem, 4vw, 3rem) 1rem calc(var(--dock-height) + 1rem);
-  background: rgba(73, 84, 81, .18);
-  backdrop-filter: blur(1px);
+  pointer-events: none;
 }
 
 .contact-window {
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
   width: min(680px, 100%);
@@ -257,7 +257,7 @@ a { color: inherit; text-decoration: none; }
 .window-controls, .mini-controls { display: flex; align-items: center; gap: 3px; }
 .window-controls img { display: block; width: 34px; height: 32px; image-rendering: pixelated; }
 
-.notice-wrap { position: relative; z-index: 10; display: flex; justify-content: center; padding: clamp(7rem, 14vh, 11rem) 1.5rem calc(var(--dock-height) + 2rem); pointer-events: none; }
+.notice-wrap { position: fixed; inset: 0 0 var(--dock-height); z-index: 10; display: flex; align-items: center; justify-content: center; padding: 8px; pointer-events: none; }
 .notice-wrap[hidden] { display: none; }
 
 .notice-window {
@@ -468,11 +468,11 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid 
   display: grid;
   place-items: center;
   padding: clamp(12px, 3vw, 30px);
-  background: rgba(52, 62, 63, .25);
-  backdrop-filter: blur(1.5px);
+  pointer-events: none;
 }
 
 .archives-window {
+  pointer-events: auto;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -600,7 +600,6 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid 
   .topbar { grid-template-columns: 1fr auto; align-items: start; }
   .wordmark { grid-row: 1; grid-column: 1; justify-self: start; }
   .nav { grid-row: 1; grid-column: 2; padding-top: 0; }
-  .notice-wrap { padding-top: 12vh; }
   .desktop-folders { left: clamp(1rem, 4vw, 2rem); bottom: calc(var(--dock-height) + 1.5rem); grid-template-columns: repeat(2, 82px); gap: 1.25rem .5rem; font-size: .9rem; }
   .desktop-icon { width: 82px; grid-template-rows: 54px auto; }
   .folder { width: 50px; }
@@ -639,7 +638,6 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid 
   .contact-status { margin-top: .25rem; font-size: .78rem; }
   .contact-send { grid-column: 1; width: 112px; height: 39px; }
   .window-controls { display: none; }
-  .notice-wrap { padding: 14vh 1rem calc(var(--dock-height) + 2rem); }
   .notice-body { grid-template-columns: 108px minmax(0, 1fr); gap: .65rem .85rem; padding: 1.25rem; }
   .sunset-art {
     grid-column: 1;
@@ -710,7 +708,6 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid 
 @media (max-height: 500px) and (orientation: landscape) {
   :root { --dock-height: clamp(42px, 11vh, 52px); }
   .desktop { min-height: max(100dvh, 680px); }
-  .notice-wrap { position: fixed; inset: 0 0 var(--dock-height); align-items: center; padding: 8px; }
   .notice-window {
     width: min(70vw, 650px);
     height: min(70dvh, 260px);
@@ -783,7 +780,7 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid 
   position: relative;
   display: block;
   flex: none;
-  width: min(500px, 78vw, calc(100dvh - var(--dock-height) - 56px));
+  width: min(460px, 71.76vw, calc((100dvh - var(--dock-height) - 56px) * .92));
   height: auto;
   aspect-ratio: 1519 / 1404;
   min-width: 0;
@@ -954,3 +951,75 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid 
   min-height: 18px;
   background-size: 55% 70%;
 }
+
+/* The dock launches a self-contained copy of the ZUMA player. */
+.dock-player-trigger { pointer-events: auto; min-width: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; cursor: pointer; }
+.dock-player-trigger:hover { filter: brightness(1.13); }
+.dock-player-trigger:active { transform: none; box-shadow: none; }
+.dock-player-trigger:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+/* Touch may inherit :focus-visible when focus crosses the player iframe. */
+html[data-input-mode="pointer"] .dock-item:focus,
+html[data-input-mode="pointer"] .taskbar-window:focus { outline: none; }
+html[data-input-mode="keyboard"] .dock-item:focus { outline: 2px solid #fff; outline-offset: -4px; }
+.player-layer[hidden] { display: none; }
+.player-layer { position: fixed; z-index: 60; inset: 0 0 var(--dock-height); overflow: hidden; pointer-events: none; clip-path: inset(50%); }
+.player-layer iframe { display: block; width: 100%; height: 100%; border: 0; background: transparent; pointer-events: auto; }
+
+/* Compact Socials defaults; resize and small-screen wrapping remain available. */
+.notice-window { width: min(500px, 100%); padding-bottom: 18px; }
+.notice-window::after { height: 18px; }
+.notice-window .titlebar { flex: 0 0 auto; height: calc(var(--desktop-title-height) - 1px); font-size: calc(var(--desktop-chrome-reference) * .05); font-weight: 400; }
+.notice-window .mini-wave { width: calc(var(--desktop-chrome-reference) * .079); height: calc(var(--desktop-title-height) * .5); }
+.notice-window .mini-controls img, .notice-window .notice-minimize { width: var(--desktop-control-width); min-width: 0; height: var(--desktop-control-height); }
+.notice-body { grid-template-columns: 132px minmax(0, 1fr); gap: 18px; padding: 18px; }
+.sunset-art { width: 132px; min-height: 146px; background-size: 975px 650px; background-position: -256px -263px; }
+.message h1 { margin-bottom: 17px; font-size: 25px; letter-spacing: -.06rem; }
+.message p { font-size: 13px; }
+.message .invite { margin-top: 15px; }
+.message form { grid-template-columns: minmax(0, 1fr) 72px; gap: 8px; margin-top: 14px; }
+.message form input, .message form button { height: 33px; font-size: 14px; }
+@media (max-width: 680px) {
+  .notice-window { width: min(340px, 100%); }
+  .notice-body { grid-template-columns: 92px minmax(0, 1fr); gap: 8px 12px; padding: 14px; }
+  .sunset-art { width: 92px; min-height: 101px; background-size: 680px 453px; background-position: -178px -183px; }
+  .message h1 { margin: 0; font-size: 21px; }
+  .message > p:not(.invite):not(.form-error), .message .invite { font-size: 12px; }
+  .message .invite { margin-top: 0; }
+  .message form { margin-top: 8px; }
+  .message form input { font-size: 16px; }
+}
+/* The adjustable dock belongs only to phone portrait touch layouts. */
+@media (max-width: 680px) and (orientation: portrait) and (pointer: coarse) {
+  .zuma-dock .dock-task-area { width: var(--portrait-dock-width, 40vw); }
+  .zuma-dock .dock-tasks { right: var(--portrait-dock-width, 40vw); }
+  /* A definite grid row prevents wider images from growing the row vertically. */
+  .zuma-dock .dock-icons { grid-template-rows: minmax(0, 1fr); min-height: 0; }
+  .zuma-dock .dock-item:not(.dock-sign) { min-height: 0; height: var(--dock-height); }
+  .zuma-dock .dock-item:not(.dock-sign) img { height: calc(var(--dock-height) * .55); }
+  .dock-item.dock-sign {
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    cursor: ew-resize;
+  }
+  .dock-item.dock-sign img { -webkit-touch-callout: none; }
+  .zuma-dock.is-adjusting-dock .dock-sign img { filter: brightness(1.1); }
+}
+
+/* Elastic task swipes stay on the horizontal axis and only apply to mobile touch. */
+@media (pointer: coarse) and (max-width: 960px) {
+  .dock-task-list { touch-action: none; }
+  .dock-task-list .taskbar-window { transform: translateX(var(--task-pull, 0px)); transition: none; will-change: transform; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dock-task-list .taskbar-window { transition: none; }
+}
+
+/* Launch feedback stays outside the clipped iframe, including a failed startup. */
+.player-launch-status[hidden] { display: none; }
+.player-launch-status { position: fixed; z-index: 119; right: 16px; bottom: calc(var(--dock-height) + 12px); padding: 10px 14px; max-width: calc(100vw - 32px); background: #f0e1d1; color: #423931; border: 2px outset #f8efde; font: 14px Arial, sans-serif; box-shadow: 2px 3px 4px #493c3a30; }
+.player-launch-status button { margin-left: 10px; padding: 4px 10px; width: auto; height: auto; font: inherit; }
+.dock-player-trigger { touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.dock-player-trigger img { pointer-events: none; -webkit-user-drag: none; -webkit-touch-callout: none; }

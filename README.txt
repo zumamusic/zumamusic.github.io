@@ -1,11 +1,19 @@
 ZUMA MUSIC WEBSITE PACKAGE
 
-This is the static Zuma site with the Contact, Socials, and Archives windows.
+This is the static Zuma site with the Contact, Socials, Archives, and ZUMA Player windows.
 Keep the entire folder together when deploying to GitHub Pages or another host.
 
 LOCAL PREVIEW
 From this folder, run: python3 -m http.server 4174
 Then visit: http://127.0.0.1:4174/
+
+ZUMA PLAYER
+Click the record player icon in the dock to open ZUMA Player. It starts with
+EQ, Playlist, and MilkDrop closed. Use EQ and PL in the player to open their
+panels, and click the black disc to toggle MilkDrop. Drag the small grip at the
+bottom right of the transport window to scale the player. Its audio and artwork
+are included in this folder. player-source/ contains the editable player source;
+run npm install and npm run build there to rebuild player/ after changes.
 
 ARCHIVES
 Click the archive icon in the dock to open Archives. Click the Socials desktop

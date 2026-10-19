@@ -15,7 +15,9 @@
   <meta name="twitter:image" content="https://zuma.music/og.png">
   <link rel="icon" href="dolphin-favicon.png">
   <link rel="apple-touch-icon" href="dolphin-favicon.png">
-  <link rel="stylesheet" href="styles.css?v=20261004-contact-flow">
+  <link rel="stylesheet" href="styles.css?v=20261014-socials-fixed">
+  <link rel="preload" as="image" href="assets/archives-ivory-grain.webp" fetchpriority="low">
+  <link rel="stylesheet" href="archives-skin.css?v=20261014-all-viewers">
 </head>
 <body>
   <main class="desktop">
@@ -65,13 +67,19 @@
     <div class="archives-layer" id="archives-layer" hidden>
       <section class="archives-window" id="archives-window" role="dialog" aria-modal="false" aria-labelledby="archives-title">
         <div class="archives-titlebar">
-          <img src="dock-archives.png" alt="" class="archives-title-icon">
+          <img class="archives-title-icon" src="dock-archives.png" alt="">
           <h2 id="archives-title">Archives</h2>
           <div class="archives-window-controls">
-            <button id="archives-minimize" type="button" aria-label="Minimize archives window"><span class="archives-minimize-glyph" aria-hidden="true"></span></button>
-            <button id="archives-maximize" type="button" aria-label="Maximize archives window"><span class="archives-maximize-glyph" aria-hidden="true"></span></button>
-            <button id="archives-close" type="button" aria-label="Close archives window"><img src="window-close.png" alt=""></button>
+            <button id="archives-minimize" type="button" aria-label="Minimize archives window"><img src="assets/archives-task.png" alt=""></button>
+            <button id="archives-maximize" type="button" aria-label="Maximize archives window"><img src="assets/archives-max.png" alt=""></button>
+            <button id="archives-close" type="button" aria-label="Close archives window"><img src="assets/archives-close.png" alt=""></button>
           </div>
+        </div>
+        <div class="archives-menubar" aria-label="Archives menu">
+          <details><summary>View</summary><div class="archives-menu" aria-label="Archives view">
+            <button type="button" data-archive-view="dropdown" aria-pressed="true">Dropdown View</button>
+            <button type="button" data-archive-view="folder" aria-pressed="false">Folder View</button>
+          </div></details>
         </div>
         <div class="archives-toolbar">
           <span class="archives-toolbar-label">Address</span>
@@ -80,17 +88,17 @@
         <div class="archives-explorer">
           <nav class="archives-tree" aria-label="Archive folders">
             <div class="archives-tree-root">
-              <button id="archives-root-toggle" class="archives-tree-toggle" type="button" aria-label="Expand LA Archives" aria-expanded="false">+</button>
-              <button id="archives-root-select" class="archives-tree-folder" type="button" data-folder="root"><img src="archive-folder.png" alt="">LA_Archives</button>
+              <button id="archives-root-toggle" class="archives-tree-toggle" type="button" aria-label="Collapse Zuma Archives" aria-expanded="true">−</button>
+              <button id="archives-root-select" class="archives-tree-folder" type="button" data-folder="root"><span class="archives-folder-icon" aria-hidden="true"></span>Zuma_Archives</button>
             </div>
-            <div id="archives-tree-children" class="archives-tree-children" hidden></div>
+            <div id="archives-tree-children" class="archives-tree-children"></div>
           </nav>
           <div class="archives-content">
-            <div class="archives-content-heading"><span id="archives-current-folder">LA_Archives</span><span id="archives-item-count">1 folder</span></div>
+            <div class="archives-content-heading"><span id="archives-current-folder">Zuma_Archives</span><span id="archives-item-count">1 folder</span></div>
             <div class="archives-grid" id="archives-grid"></div>
           </div>
         </div>
-        <div class="archives-statusbar"><span id="archives-status">1 object</span><button class="window-resize-handle archives-status-grip" type="button" aria-label="Resize archives window"></button></div>
+        <div class="archives-statusbar"><button class="window-resize-handle archives-status-grip" type="button" aria-label="Resize archives window"></button></div>
         <div class="archives-viewer" id="archives-viewer" hidden>
           <div class="archives-viewer-top"><button id="archives-viewer-back" type="button">← Back to files</button><span id="archives-viewer-index"></span></div>
           <div class="archives-viewer-stage">
@@ -139,6 +147,11 @@
       <a class="desktop-icon youtube-icon" href="https://www.youtube.com/@zumamusc" target="_blank" rel="noreferrer"><img class="folder" src="folder-icon.png" alt="">YouTube</a>
     </section>
 
+    <div class="player-launch-status" id="player-launch-status" role="status" hidden><span>Opening player…</span><button type="button" hidden>Retry</button></div>
+    <section class="player-layer" id="player-layer" aria-label="ZUMA Player" hidden>
+      <iframe id="player-frame" title="ZUMA Player" allow="autoplay" loading="eager"></iframe>
+    </section>
+
     <footer class="zuma-dock" aria-label="Zuma menu preview">
       <img class="dock-menu-bg" src="dock-menu.png" alt="">
       <div class="dock-start-panel" aria-hidden="true">
@@ -150,13 +163,17 @@
       <div class="dock-task-area">
         <img class="dock-task-bg" src="dock-taskbar.png" alt="">
         <div class="dock-icons" aria-label="Future Zuma sections">
-          <span class="dock-item dock-sign"><img src="dock-sign.png" alt="Sign"></span><button class="dock-item dock-archives-trigger" id="dock-archives-trigger" type="button" aria-label="Open Archives window" aria-haspopup="dialog"><img src="dock-archives.png" alt=""></button><span class="dock-item"><img src="dock-playlist.png" alt="Playlist"></span><span class="dock-item"><img src="dock-shop.png" alt="Shop"></span><span class="dock-item"><img src="dock-about.png" alt="About"></span>
+          <span class="dock-item dock-sign"><img src="dock-sign.png" alt="Sign" draggable="false"></span><button class="dock-item dock-archives-trigger" id="dock-archives-trigger" type="button" aria-label="Open Archives window" aria-haspopup="dialog"><img src="dock-archives.png" alt=""></button><button class="dock-item dock-player-trigger" id="dock-player-trigger" type="button" aria-label="Open ZUMA Player" aria-haspopup="dialog" aria-pressed="false"><img src="dock-playlist.png" alt="" draggable="false"></button><span class="dock-item"><img src="dock-shop.png" alt="Shop"></span><span class="dock-item"><img src="dock-about.png" alt="About"></span>
         </div>
       </div>
     </footer>
   </main>
-  <script src="script.js?v=20261004-contact-flow"></script>
-  <script src="archives.js?v=20261004-archive-root"></script>
-  <script src="window-controls.js?v=20261004-contact-flow"></script>
+  <script src="dock-drop.js?v=20261012-edges"></script>
+  <script src="portrait-dock.js?v=20261014-reset"></script>
+  <script src="script.js?v=20261014-socials-fixed"></script>
+  <script type="module" src="archives.js?v=20261011-compact"></script>
+  <script src="mobile-task-swipe.js?v=20261014-overflow-swipe"></script>
+  <script src="window-controls.js?v=20261014-socials-fixed"></script>
+  <script src="player-window.js?v=20261017-dock"></script>
 </body>
 </html>

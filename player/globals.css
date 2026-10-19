@@ -1,0 +1,470 @@
+@import "./eq-native.css";
+@import "./window-native.css";
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { margin: 0; background: #101414; color: #eee; font-family: Arial, sans-serif; }
+main { min-height: 100vh; padding: 28px; }
+.intro, footer { display: none; }
+.zuma-svg-filters { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
+.stage { position: relative; width: min(1120px, 100%); min-height: 690px; margin: 0 auto; overflow: auto; background: #090c0c; }
+
+/* Keep Webamp's 275 × 116 main-window geometry and
+   native window manager; no borders that change its docking bounds. */
+#webamp #main-window {
+  background: #f0ece2 !important;
+  border: 0;
+  box-shadow: none;
+  image-rendering: auto;
+}
+#webamp #main-window:not(.shade)::before {
+  content: ""; position: absolute; left: 5px; top: 17px; width: 89px; height: 43px;
+  background: radial-gradient(#293031 .45px, transparent .6px) 0 0 / 3px 3px, #050606;
+  border: 1px inset #adaba7; pointer-events: none;
+}
+#webamp #main-window:not(.shade)::after {
+  content: ""; position: absolute; left: 9px; top: 84px; width: 201px; height: 28px;
+  background: url('/zuma-transport/transport-baked.png') center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+#webamp #main-window #title-bar {
+  height: 14px; background: url('/zuma-player/titlebar-bright.png') center / 100% 100% no-repeat, #65b9ef !important;
+  box-shadow: inset 0 1px #58c9f0;
+}
+#webamp #main-window #title-bar::after {
+  content: 'ZUMA Player'; position: absolute; left: 5px; top: 1px;
+  font: bold 9px/12px Tahoma, Arial, sans-serif; color: #fff; pointer-events: none;
+}
+#webamp #main-window #title-bar #close {
+  left: 262px; top: 1.5px; width: 11px; height: 11px;
+  background: url('/zuma-transport/close.png') center / contain no-repeat !important;
+  image-rendering: auto;
+}
+#webamp #main-window #option-context,
+#webamp #main-window #repeat { display: none !important; }
+#webamp #main-window #title-bar #minimize,
+#webamp #main-window #title-bar #shade {
+  display: block !important; top: 1.5px; width: 11px; height: 11px;
+  image-rendering: auto;
+}
+#webamp #main-window #title-bar #minimize {
+  left: 238px; background: url('/zuma-transport/minimize.png') center / contain no-repeat !important;
+}
+#webamp #main-window #title-bar #shade {
+  left: 250px; pointer-events: none; background: url('/zuma-transport/shade.png') center / contain no-repeat !important;
+}
+#webamp #main-window #title-bar .zuma-compact-toggle {
+  position: absolute; left: 250px; top: 1.5px; width: 11px; height: 11px;
+  padding: 0; border: 0; background: transparent; z-index: 4; cursor: pointer;
+}
+#webamp #main-window #title-bar .zuma-compact-toggle:focus-visible { outline: 1px solid #fff; }
+
+/* Keep the original bitmap readouts and analyser, with matching dark wells. */
+#webamp #main-window .webamp-status,
+#webamp #main-window .media-info,
+#webamp #main-window #marquee { image-rendering: pixelated; }
+#webamp #main-window #clutter-bar { display: none; }
+#webamp #main-window .zuma-audio-label {
+  position: absolute; left: 8px; top: 18px; z-index: 3;
+  color: #697478; font: bold 7px/8px monospace; text-align: center;
+  pointer-events: none;
+}
+#webamp #main-window #play-pause { left: 15px; top: 23px; }
+#webamp #main-window #work-indicator { left: 12px; top: 23px; }
+#webamp #main-window .webamp-status #time { left: 36px; top: 22px; transform: scaleX(.9); transform-origin: top left; filter: saturate(.2) brightness(1.4); }
+#webamp #main-window.stop .webamp-status #time { display: block; }
+#webamp #main-window .webamp-status #time::after { content: ':'; position: absolute; left: 31px; top: 0; font: bold 12px/13px monospace; color: #becbc8; }
+#webamp #main-window #visualizer { left: 17px; top: 44px; transform: scaleX(.97); transform-origin: top left; }
+#webamp #main-window #marquee { left: 99px; top: 18px; width: 168px; height: 6px; padding: 3px 1px; background: #060707; box-shadow: 0 0 0 1px #878980; }
+#webamp #main-window #marquee .character {
+  filter: hue-rotate(85deg) saturate(.36) brightness(1.3);
+  filter: url('#zuma-title-blue');
+}
+#webamp #main-window .media-info #kbps { left: 102px; top: 36px; overflow: visible; }
+#webamp #main-window .media-info #khz { left: 150px; top: 36px; overflow: visible; }
+#webamp #main-window .media-info #kbps, #webamp #main-window .media-info #khz { background: #050606; box-shadow: 0 0 0 2px #050606, 0 0 0 3px #9e9b90; }
+#webamp #main-window .media-info #kbps::after { content: 'kbps'; }
+#webamp #main-window .media-info #khz::after { content: 'kHz'; }
+#webamp #main-window .media-info #kbps::after, #webamp #main-window .media-info #khz::after { position: absolute; left: 23px; top: -1px; font: 7px/8px Tahoma, sans-serif; color: #151515; }
+#webamp #main-window .media-info .mono-stereo { left: 212px; top: 34px; }
+#webamp #main-window .media-info #mono, #webamp #main-window .media-info #stereo { background: none !important; font: 7px/12px monospace; color: #141414; }
+#webamp #main-window .media-info #mono::after { content: 'mono'; }
+#webamp #main-window .media-info #stereo::after { content: 'stereo'; }
+#webamp #main-window .media-info .mono-stereo .selected { color: #15c616 !important; text-shadow: 0 0 3px #8cf779; }
+
+#webamp #main-window #volume { left: 100px; top: 50px; width: 59px; height: 11px; background: none !important; }
+#webamp #main-window #volume input { width: 59px; height: 11px; }
+#webamp #main-window #balance { left: 166px; top: 50px; width: 49px; height: 11px; background: none !important; touch-action: none; }
+#webamp #main-window #volume input::-webkit-slider-runnable-track { height: 6px; border-radius: 5px; background: linear-gradient(#986e46,#dea86e); box-shadow: inset 0 1px 1px #231519; }
+#webamp #main-window #balance::-webkit-slider-runnable-track { height: 6px; border-radius: 5px; background: linear-gradient(#25ccd3,#acdee1); box-shadow: inset 0 1px 1px #153216; }
+#webamp #main-window #volume input::-webkit-slider-thumb, #webamp #main-window #balance::-webkit-slider-thumb { margin-top: -3px; }
+#webamp #main-window #volume input::-moz-range-track { height: 6px; border-radius: 5px; background: linear-gradient(#986e46,#dea86e); box-shadow: inset 0 1px 1px #231519; }
+#webamp #main-window #balance::-moz-range-track { height: 6px; border-radius: 5px; background: linear-gradient(#25ccd3,#acdee1); box-shadow: inset 0 1px 1px #153216; }
+#webamp #main-window .windows { left: 217px; top: 50px; }
+#webamp #main-window #equalizer-button,
+#webamp #main-window #playlist-button {
+  filter: brightness(1.28) saturate(.72) sepia(.06);
+}
+#webamp #main-window #position { left: 10px; top: 68px; width: 255px; height: 9px; background: linear-gradient(#141417,#222225) !important; box-shadow: inset 0 -1px #7b7891; }
+#webamp #main-window #position::-webkit-slider-thumb { width: 20px; height: 9px; background: linear-gradient(#d9c998,#ad9656) !important; box-shadow: inset 1px 1px #fff3c8, inset -1px -1px #6b572f, inset 3px 3px #b7a16b, inset -3px -3px #ede0b5; }
+#webamp #main-window #position::-moz-range-thumb { width: 20px; height: 9px; background: linear-gradient(#d9c998,#ad9656) !important; border: 1px outset #eee1b6; }
+#webamp #main-window.stop #position::-webkit-slider-thumb { visibility: visible; }
+#webamp #main-window.stop #position::-moz-range-thumb { visibility: visible; }
+
+/* The existing Webamp controls keep their event handlers beneath the new art. */
+#webamp #main-window .actions > div,
+#webamp #main-window #eject,
+#webamp #main-window #shuffle { z-index: 2; cursor: pointer; image-rendering: auto; }
+#webamp #main-window .actions #previous { left: 14px; top: 91px; width: 16px; height: 16px; background: url('/zuma-transport/previous.png') center / contain no-repeat !important; }
+#webamp #main-window .actions #next { left: 58px; top: 91px; width: 16px; height: 16px; background: url('/zuma-transport/next.png') center / contain no-repeat !important; }
+#webamp #main-window .actions #play,
+#webamp #main-window .actions #pause { left: 31.5px; top: 85px; width: 26.5px; height: 26.5px; border: 0; border-radius: 0; box-shadow: none; }
+#webamp #main-window .actions #play,
+#webamp #main-window .actions #pause { background: url('/zuma-transport/play-shared.png') center / contain no-repeat !important; }
+#webamp #main-window .actions #play::after,
+#webamp #main-window .actions #pause::after {
+  content: ''; position: absolute; left: 50%; top: 50%; pointer-events: none;
+}
+#webamp #main-window .actions #play::after {
+  transform: translate(-42%, -50%); width: 0; height: 0;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+  border-left: 7px solid #00161d;
+}
+#webamp #main-window .actions #pause::after {
+  transform: translate(-50%, -50%); width: 8px; height: 10px;
+  background: linear-gradient(90deg, #00161d 0 35%, transparent 35% 65%, #00161d 65% 100%);
+}
+#webamp #main-window .actions #stop { display: block !important; left: 75.5px; top: 91px; width: 16px; height: 16px; background: url('/zuma-transport/stop.png') center / contain no-repeat !important; }
+#webamp #main-window #eject { display: block !important; left: 92.5px; top: 91px; width: 16px; height: 16px; background: url('/zuma-transport/eject.png') center / contain no-repeat !important; }
+#webamp #main-window .shuffle-repeat { display: block !important; position: absolute; left: 116.5px; top: 94px; width: 39px; height: 9px; z-index: 2; }
+#webamp #main-window #shuffle { display: block !important; position: absolute; left: 0; top: 0; width: 39px; height: 9px; background: url('/zuma-transport/shuffle.png') center / contain no-repeat !important; }
+#webamp #main-window #shuffle.selected { filter: brightness(1.12) drop-shadow(0 0 1px #4aff73); }
+#webamp #main-window.play #play, #webamp #main-window:not(.play) #pause { display: none; }
+#webamp #main-window .actions .winamp-active { filter: brightness(.85); }
+#webamp #main-window #about { left: 193px; top: 99px; width: 15px; height: 10px; z-index: 2; background: none !important; }
+#webamp #main-window .zuma-transport-decor { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+#webamp #main-window .zuma-transport-decor .divider { position: absolute; left: 110px; top: 92px; width: 1px; height: 12px; background: url('/zuma-transport/divider.png') center / 100% 100% no-repeat; }
+#webamp #main-window .zuma-transport-decor .spotify { position: absolute; left: 161.5px; top: 92px; width: 13.5px; height: 12px; background: url('/zuma-transport/spotify.png') center / contain no-repeat; }
+#webamp #main-window .zuma-visualizer-toggle {
+  position: absolute; left: 218px; top: 85px; z-index: 2;
+  width: 27px; height: 27px; padding: 0;
+  border: 0; border-radius: 50%; background: #000;
+  cursor: pointer; touch-action: manipulation;
+}
+#webamp #main-window .zuma-visualizer-toggle[aria-pressed='true'] {
+  box-shadow: 0 0 0 1px #6bdee1, 0 0 4px #6bdee1;
+}
+#webamp #main-window .zuma-visualizer-toggle:focus-visible { outline: 2px solid #acdee1; outline-offset: 2px; }
+#webamp .window .zuma-main-resize-grip {
+  position: absolute; right: 2px; bottom: 1px; z-index: 10;
+  width: 13px; height: 13px; padding: 0; border: 0;
+  background: url('/zuma-player/grip.png') center / contain no-repeat;
+  appearance: none; border-radius: 0; image-rendering: auto;
+  cursor: nwse-resize; touch-action: none;
+}
+#webamp .window .zuma-main-resize-grip:disabled { cursor: default; opacity: .5; }
+#webamp .window .zuma-main-resize-grip:focus-visible { outline: 1px solid #597c93; }
+#webamp #main-window.shade .zuma-transport-decor { display: none; }
+#webamp #main-window.shade .zuma-visualizer-toggle,
+#webamp .window.shade .zuma-main-resize-grip { display: none; }
+#webamp #main-window .zuma-tray-volume { display: none; position: absolute; z-index: 2; left: 120px; top: 91px; width: 85px; height: 12px; appearance: none; touch-action: none; cursor: pointer; background: transparent; }
+#webamp #main-window .zuma-tray-volume::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(to right, #9edee2 var(--volume), #b8b0a5 var(--volume)); border: 1px solid #938e83; }
+#webamp #main-window .zuma-tray-volume::-webkit-slider-thumb { width: 5px; height: 6px; margin-top: -2px; border-radius: 3px; background: #b2e5e7; }
+#webamp #main-window .zuma-tray-volume::-moz-range-track { height: 4px; border-radius: 4px; background: #b8b0a5; }
+#webamp #main-window .zuma-tray-volume::-moz-range-progress { background: #9edee2; height: 4px; }
+#webamp #main-window .zuma-tray-volume::-moz-range-thumb { width: 5px; height: 6px; background: #b2e5e7; }
+#webamp #main-window.shade .zuma-tray-volume { display: none; }
+@media (max-width:720px) {
+  main { padding:8px; }
+  .stage { min-height:760px; }
+  /* The last columns of the EQ slider sprites are separator pixels that
+     appear as stray brackets when Mobile Safari magnifies the skin. */
+  #webamp #equalizer-window .band { width: 13px; overflow: hidden; }
+}
+
+/* The compact transport shares Webamp's audio instance and only changes its view. */
+.zuma-compact-view .stage { visibility: hidden; pointer-events: none; }
+.zuma-compact-view #webamp #main-window #position { display: none !important; }
+.zuma-mini-player {
+  position: fixed; width: 275px; height: 50px; z-index: 10000;
+  filter: drop-shadow(0 3px 4px #0008);
+  user-select: none; -webkit-user-select: none;
+}
+.zuma-mini-titlebar {
+  position: absolute; left: 8px; top: 0; width: 259px; height: 19px;
+  background: url('/zuma-mini/Panel.png') center / 100% 100% no-repeat;
+  cursor: move; touch-action: none;
+}
+.zuma-mini-title {
+  position: absolute; left: 6px; right: 58px; top: 3px;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  color: #acdee1; font: 9px/12px Tahoma, Arial, sans-serif;
+  pointer-events: none;
+}
+.zuma-mini-window-controls {
+  position: absolute; right: 7px; top: 4px; display: flex; align-items: center; gap: 5px;
+}
+.zuma-mini-window-controls button {
+  width: 11px; height: 11px; padding: 0; border: 0; cursor: pointer;
+  background-color: transparent; background-position: center; background-repeat: no-repeat;
+}
+.zuma-mini-minimize { background-image: url('/zuma-mini/Vector.png'); background-size: 10px 3px; }
+.zuma-mini-restore { background-image: url('/zuma-mini/Vector-1.png'); background-size: 9px 9px; }
+.zuma-mini-close { background-image: url('/zuma-mini/Vector-2.png'); background-size: 9px 9px; }
+.zuma-mini-frame { position: absolute; left: 0; top: 16px; width: 275px; height: 33px; }
+.zuma-mini-frame::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('/zuma-mini/mini-compact-baked.png') center / 100% 100% no-repeat;
+  border-radius: 17px;
+}
+.zuma-mini-frame button,
+.zuma-mini-frame span,
+.zuma-mini-frame input { position: absolute; z-index: 1; }
+.zuma-mini-frame button {
+  padding: 0; border: 0; cursor: pointer; background-color: transparent;
+  background-position: center; background-repeat: no-repeat; background-size: contain;
+}
+.zuma-mini-frame button:hover,
+.zuma-mini-window-controls button:hover { filter: brightness(1.12); }
+.zuma-mini-frame button:active { filter: brightness(.86); }
+.zuma-mini-previous { left: 12px; top: 6px; width: 23px; height: 23px; background-image: url('/zuma-mini/Previous-track.png'); }
+.zuma-mini-play { left: 38.5px; top: -1px; width: 34px; height: 34px; background-image: url('/zuma-transport/play-shared.png'); }
+.zuma-mini-play::after {
+  content: ''; position: absolute; left: 50%; top: 50%; pointer-events: none;
+  transform: translate(-42%, -50%); width: 0; height: 0;
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+  border-left: 9px solid #00161d;
+}
+.zuma-mini-play.is-playing::after {
+  transform: translate(-50%, -50%); width: 10px; height: 12px; border: 0;
+  background: linear-gradient(90deg, #00161d 0 35%, transparent 35% 65%, #00161d 65% 100%);
+}
+.zuma-mini-next { left: 76px; top: 6px; width: 23px; height: 23px; background-image: url('/zuma-mini/Next-track.png'); }
+.zuma-mini-divider { left: 105px; top: 7px; width: 1px; height: 20px; background: #e8f8ff; box-shadow: 1px 0 #7a99b4; }
+.zuma-mini-seek-art {
+  left: 113px; top: 15px; width: 95px; height: 8px;
+  overflow: hidden; pointer-events: none;
+}
+.zuma-mini-seek-art::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('/zuma-mini/mini-compact-ref.png') -153.3px -35.6px / 328.3px 57.8px no-repeat;
+}
+.zuma-mini-seek-art .zuma-mini-seek-thumb {
+  position: absolute; top: 0; width: 16px; height: 8px;
+  background: url('/zuma-mini/mini-compact-ref.png') -113px -29.9px / 275px 48.4px no-repeat;
+}
+.zuma-mini-seek {
+  left: 113px; top: 8px; z-index: 2 !important; width: 95px; height: 20px; margin: 0;
+  appearance: none; -webkit-appearance: none; cursor: pointer; opacity: 0;
+}
+.zuma-mini-seek:focus-visible { opacity: .18; outline: 1px solid #acdee1; }
+.zuma-mini-dock {
+  position: fixed; left: 12px; bottom: 12px; z-index: 10000;
+  display: flex; align-items: center; gap: 6px; padding: 5px 10px;
+  border: 1px solid #93b5cf; border-radius: 5px;
+  color: #fff; font: bold 12px Tahoma, Arial, sans-serif;
+  background: linear-gradient(#70c1ef, #5d8ed4); box-shadow: 0 2px 5px #0008;
+  cursor: pointer;
+}
+.zuma-mini-dock-mark { width: 16px; height: 11px; background: url('/zuma-mini/Zuma-rainbow-mark.png') center / contain no-repeat; }
+
+/* Geometry, artwork, labels and interaction states come from Webamp. */
+#webamp #equalizer-window { image-rendering: pixelated; }
+#webamp #equalizer-window #on,
+#webamp #equalizer-window #auto,
+#webamp #equalizer-window #presets {
+  filter: brightness(1.28) saturate(.72) sepia(.06);
+}
+/* Restore the requested lit AUTO artwork; Webamp itself does not implement auto presets. */
+#webamp #equalizer-window #auto { background-image: url('/zuma-eq/native-12.png') !important; }
+#webamp #equalizer-window #auto.winamp-active { background-image: url('/zuma-eq/native-13.png') !important; }
+#webamp #equalizer-window:not(.shade)::before {
+  content: ''; position: absolute; left: 86px; top: 17px; width: 113px; height: 19px;
+  background: repeating-linear-gradient(90deg, transparent 0 11px, #cfc7ba 11px 12px), repeating-linear-gradient(0deg, #f0e9de 0 8px, #cfc7ba 8px 9px);
+  box-shadow: 0 0 0 1px #a29b8e, inset 1px 1px #fffaf2;
+  pointer-events: none;
+}
+#webamp #equalizer-window #eqGraph {
+  background: transparent !important;
+}
+#webamp #equalizer-window .equalizer-top::after {
+  content: 'ZUMA EQUALIZER'; position: absolute; left: 94px; top: 3px;
+  width: 97px; height: 8px; background: #e6e0d6; color: #6e6a62;
+  font: bold 7px/8px monospace; text-align: center; pointer-events: none;
+}
+
+/* Native Playlist and MilkDrop chrome, recolored without changing layout. */
+#webamp #playlist-window,
+#webamp .gen-window { image-rendering: pixelated; }
+#webamp .gen-window [class*='gen-text-'] {
+  filter: brightness(0) saturate(0) opacity(.58);
+}
+#webamp #playlist-window .playlist-top-title { position: relative; }
+#webamp #playlist-window .playlist-top-title::after {
+  content: 'ZUMA PLAYLIST'; position: absolute; inset: 0;
+  display: grid; place-items: center; background: #e6e0d6; color: #6e6a62;
+  font: bold 7px/10px monospace; text-align: center; pointer-events: none;
+}
+#webamp #playlist-add-menu,
+#webamp #playlist-remove-menu,
+#webamp #playlist-selection-menu,
+#webamp #playlist-misc-menu,
+#webamp #playlist-list-menu {
+  filter: brightness(1.28) saturate(.72) sepia(.06);
+}
+
+/* Built ZUMA Playlist surface. Native data, menus, resizing and window actions remain intact. */
+#webamp #playlist-window {
+  background: #f6efe6 !important;
+  color: #171717 !important;
+  box-shadow: inset 1px 1px #fff, inset -1px -1px #8f887e;
+}
+#webamp #playlist-window .playlist-top {
+  height: 23px;
+  min-height: 23px;
+  max-height: 23px;
+  background: #b5ad9f !important;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+#webamp #playlist-window .playlist-top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-image: url('/zuma-chrome/playlist-border.jpg') 14 fill / 2px / 0 stretch;
+  image-rendering: auto;
+  pointer-events: none;
+}
+#webamp #playlist-window .playlist-top-left,
+#webamp #playlist-window .playlist-top-left-spacer,
+#webamp #playlist-window .playlist-top-left-fill,
+#webamp #playlist-window .playlist-top-title,
+#webamp #playlist-window .playlist-top-right-spacer,
+#webamp #playlist-window .playlist-top-right-fill,
+#webamp #playlist-window .playlist-top-right {
+  background-image: none !important;
+}
+#webamp #playlist-window .playlist-top-title::after { display: none; }
+#webamp #playlist-window .playlist-top-right { margin-left: auto; }
+#webamp #playlist-window #playlist-shade-button,
+#webamp #playlist-window #playlist-close-button {
+  width: 15px; height: 14px; top: 5px;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  filter: none;
+}
+#webamp #playlist-window #playlist-shade-button {
+  right: 21px;
+  background-image: url('/zuma-chrome/playlist-minimize.png') !important;
+}
+#webamp #playlist-window #playlist-close-button {
+  right: 4px;
+  background-image: url('/zuma-chrome/playlist-close.png') !important;
+}
+#webamp #playlist-window #playlist-shade-button::before,
+#webamp #playlist-window #playlist-shade-button::after,
+#webamp #playlist-window #playlist-close-button::before,
+#webamp #playlist-window #playlist-close-button::after {
+  content: none !important;
+}
+#webamp #playlist-window #playlist-shade-button.winamp-active,
+#webamp #playlist-window #playlist-close-button.winamp-active {
+  transform: translateY(1px);
+}
+#webamp #playlist-window .playlist-middle {
+  margin: 4px 5px 0;
+  background: #f6efe6 !important;
+  border: 1px solid #938c82;
+  overflow: hidden;
+}
+#webamp #playlist-window .playlist-middle-left {
+  display: none;
+}
+#webamp #playlist-window .playlist-middle-center {
+  padding: 0;
+  background: #f6efe6;
+}
+#webamp #playlist-window .playlist-tracks {
+  background: #f6efe6;
+  color: #171717;
+  font-family: Arial, sans-serif !important;
+}
+#webamp #playlist-window .playlist-tracks .track-cell {
+  height: 13px;
+  border-bottom: 1px solid #ded6cb;
+  color: #171717 !important;
+  background: #f6efe6 !important;
+  font-size: 9px;
+  line-height: 12px;
+  letter-spacing: 0;
+}
+#webamp #playlist-window .playlist-tracks .track-cell.selected {
+  color: #171717 !important;
+  background: #8ae0e3 !important;
+}
+#webamp #playlist-window .playlist-tracks .track-cell.current {
+  color: #171717 !important;
+}
+#webamp #playlist-window .playlist-track-durations > div {
+  padding-right: 5px;
+}
+#webamp #playlist-window .playlist-middle-right {
+  width: 15px;
+  min-width: 15px;
+  padding-bottom: 18px;
+  background: #f6efe6 !important;
+  border-left: 1px solid #ded6cb;
+}
+#webamp #playlist-window .playlist-scrollbar-handle {
+  background: #b5ad9f !important;
+  border: 1px solid #7f786e;
+  box-shadow: inset 1px 1px #eee8df;
+}
+#webamp #playlist-window #playlist-scroll-up-button,
+#webamp #playlist-window #playlist-scroll-down-button {
+  background: transparent !important;
+}
+#webamp #playlist-window #playlist-scroll-up-button::after,
+#webamp #playlist-window #playlist-scroll-down-button::after {
+  content: ''; position: absolute; left: 1px; top: 1px;
+  border-left: 3px solid transparent; border-right: 3px solid transparent;
+}
+#webamp #playlist-window #playlist-scroll-up-button::after {
+  border-bottom: 3px solid #7f786e;
+}
+#webamp #playlist-window #playlist-scroll-down-button::after {
+  border-top: 3px solid #7f786e;
+}
+#webamp #playlist-window .playlist-bottom {
+  background: #f6efe6 !important;
+  border-top: 1px solid #ded6cb;
+}
+#webamp #playlist-window .playlist-visualizer {
+  display: none !important;
+}
+/* Keep Webamp's bitmap typography, but use the title-bar blue in both modes. */
+#webamp #playlist-window .playlist-running-time-display .character,
+#webamp #playlist-window .mini-time .character:not(.background-character),
+#webamp #playlist-window-shade #playlist-shade-track-title .character,
+#webamp #playlist-window-shade #playlist-shade-time .character {
+  filter: url('#zuma-title-blue');
+}
+
+/* Stable, keyboard-accessible tap target over the native spectrum canvas. */
+#webamp #main-window .zuma-spectrum-control {
+  position: absolute; left: 17px; top: 44px; z-index: 5;
+  width: 74px; min-width: 0; height: 16px; padding: 0; margin: 0;
+  background: transparent; border: 0; border-radius: 0; box-shadow: none;
+  cursor: pointer; touch-action: manipulation;
+}
+#webamp #main-window .zuma-spectrum-control:focus-visible {
+  outline: 1px dotted #acdee1; outline-offset: 1px;
+}
+#webamp #main-window.shade .zuma-spectrum-control { display: none; }
+
+/* Scale panel contents, while window wrappers remain in viewport coordinates. */
+#webamp .window { zoom: var(--zuma-panel-scale, 1); transform: none; }
+#webamp .window .zuma-main-resize-grip[hidden] { display: none; }

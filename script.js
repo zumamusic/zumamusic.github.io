@@ -17,10 +17,8 @@
     return document.querySelector('.zuma-dock')?.getBoundingClientRect().top ?? viewportHeight;
   }
 
-  function reachedDock(event, startY) {
-    const top = dockTop(viewportSize().height);
-    return event.clientY - startY > 48 &&
-      (event.clientY >= top - 28 || notice.getBoundingClientRect().bottom >= top - 10);
+  function reachedDock(event) {
+    return event.clientY - drag.pointerY >= drag.dockDropDistance;
   }
 
   function applyPosition() {
@@ -29,13 +27,14 @@
 
   function constrain(next, start = position) {
     const rect = notice.getBoundingClientRect();
+    // Hidden windows have zero bounds; keep their saved position until restore.
+    if (!rect.width || !rect.height) return next;
     const baseLeft = rect.left - start.x;
     const baseTop = rect.top - start.y;
     const viewport = viewportSize();
-    const fitsX = rect.width <= viewport.width - 16;
     const fitsY = rect.height <= dockTop(viewport.height) - 14;
     return {
-      x: Math.min(Math.max(next.x, fitsX ? 8 - baseLeft : 80 - rect.width - baseLeft), fitsX ? viewport.width - 8 - rect.width - baseLeft : viewport.width - 80 - baseLeft),
+      x: Math.min(Math.max(next.x, -rect.width * .5 - baseLeft), viewport.width - rect.width * .5 - baseLeft),
       y: Math.min(Math.max(next.y, 12 - baseTop), fitsY ? dockTop(viewport.height) - 8 - rect.height - baseTop : dockTop(viewport.height) - 39 - baseTop)
     };
   }
@@ -47,16 +46,16 @@
     const viewport = viewportSize();
     const baseLeft = rect.left - position.x;
     const baseTop = rect.top - position.y;
-    const fitsX = rect.width <= viewport.width - 16;
     const fitsY = rect.height <= dockTop(viewport.height) - 14;
     drag = {
       pointerX: event.clientX,
       pointerY: event.clientY,
+      dockDropDistance: window.ZumaDockDrop.distance(rect, dockTop(viewport.height)),
       startX: position.x,
       startY: position.y,
       moved: false,
-      minX: fitsX ? 8 - baseLeft : 80 - rect.width - baseLeft,
-      maxX: fitsX ? viewport.width - 8 - rect.width - baseLeft : viewport.width - 80 - baseLeft,
+      minX: -rect.width * .5 - baseLeft,
+      maxX: viewport.width - rect.width * .5 - baseLeft,
       minY: 12 - baseTop,
       maxY: fitsY ? dockTop(viewport.height) - 8 - rect.height - baseTop : dockTop(viewport.height) - 39 - baseTop
     };
@@ -72,7 +71,7 @@
       y: Math.min(Math.max(drag.startY + event.clientY - drag.pointerY, drag.minY), drag.maxY)
     };
     applyPosition();
-    const onDock = drag.moved && reachedDock(event, drag.pointerY);
+    const onDock = drag.moved && reachedDock(event);
     dock.classList.toggle('is-drop-target', onDock);
     if (onDock) finishDrag(event, true);
   });
@@ -86,7 +85,7 @@
   }
   function stop(event) {
     if (!drag) return;
-    finishDrag(event, event.type === 'pointerup' && drag.moved && reachedDock(event, drag.pointerY));
+    finishDrag(event, event.type === 'pointerup' && drag.moved && reachedDock(event));
   }
   titlebar.addEventListener('pointerup', stop);
   titlebar.addEventListener('pointercancel', stop);
@@ -104,8 +103,13 @@
     event.preventDefault();
     applyPosition();
   });
-  addEventListener('resize', () => { position = constrain(position); applyPosition(); });
+  function ensureVisible() {
+    position = constrain(position);
+    applyPosition();
+  }
+  addEventListener('resize', ensureVisible);
   window.ZumaNoticeDrag = {
+    ensureVisible,
     offsetBy(x, y) {
       position = { x: position.x + x, y: position.y + y };
       applyPosition();
@@ -132,7 +136,7 @@
     contactStatus.className = 'contact-status';
     contactStatus.textContent = '';
     window.ZumaWindowManager?.close('contact');
-    contactTrigger.focus();
+    window.ZumaWindowManager?.restoreFocus(contactTrigger);
   }
 
   contactTrigger.addEventListener('click', openContact);
@@ -143,6 +147,7 @@
     if (contactLayer.hidden || !window.ZumaWindowManager?.isActive('contact')) return;
     if (event.key === 'Escape') {
       event.preventDefault();
+      event.stopImmediatePropagation();
       closeContact();
       return;
     }

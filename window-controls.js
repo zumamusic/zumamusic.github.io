@@ -35,6 +35,20 @@
   const animations = new Map();
   const zOrder = [];
   let activeName = null;
+  let inputMode = 'pointer';
+
+  function setInputMode(mode) {
+    inputMode = mode;
+    document.documentElement.dataset.inputMode = mode;
+  }
+  document.addEventListener('pointerdown', () => setInputMode('pointer'), true);
+  document.addEventListener('keydown', () => setInputMode('keyboard'), true);
+  setInputMode(inputMode);
+
+  function restoreFocus(target) {
+    if (inputMode === 'keyboard') target?.focus({ preventScroll: true });
+    else document.activeElement?.blur?.();
+  }
 
   function viewport() {
     return { width: window.visualViewport?.width ?? innerWidth, height: window.visualViewport?.height ?? innerHeight };
@@ -44,11 +58,6 @@
     return dock?.getBoundingClientRect().top ?? viewport().height;
   }
 
-  function reachedDock(event, startY, windowEl) {
-    const top = dockTop();
-    return event.clientY - startY > 48 &&
-      (event.clientY >= top - 28 || windowEl.getBoundingClientRect().bottom >= top - 10);
-  }
 
   function offsetWindow(name, x, y) {
     if (name === 'notice') {
@@ -117,7 +126,7 @@
   function animateWindow(name, direction, onFinish = () => {}) {
     const config = configs[name];
     const button = taskButtons.get(name);
-    if (name === 'contact' || !button || !config.window.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (config.embedded || name === 'contact' || !button || !config.window.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) {
       onFinish();
       return;
     }
@@ -146,6 +155,7 @@
     const wasMinimized = states.get(name) === 'minimized';
     cancelAnimation(name);
     config.layer.hidden = false;
+    if (name === 'notice') window.ZumaNoticeDrag?.ensureVisible();
     if (config.bodyClass) document.body.classList.add(config.bodyClass);
     states.set(name, 'open');
     activate(name);
@@ -153,12 +163,15 @@
       taskButtons.get(name)?.remove();
       taskButtons.delete(name);
     });
+    if (inputMode === 'keyboard') requestAnimationFrame(() => {
+      if (states.get(name) === 'open') (name === 'notice' ? config.titlebar : config.minimize || config.window).focus({ preventScroll: true });
+    });
   }
 
   function minimize(name) {
     const config = configs[name];
     if (states.get(name) !== 'open') return;
-    const keepKeyboardFocus = config.minimize.matches(':focus-visible');
+    const keepKeyboardFocus = inputMode === 'keyboard';
     cancelAnimation(name);
     if (name === 'archives') config.window.querySelector('video')?.pause();
     if (config.bodyClass) document.body.classList.remove(config.bodyClass);
@@ -174,7 +187,6 @@
 
   function restore(name) {
     open(name);
-    requestAnimationFrame(() => (name === 'notice' ? configs[name].titlebar : configs[name].minimize).focus());
   }
 
   function close(name) {
@@ -188,6 +200,7 @@
     taskButtons.get(name)?.remove();
     taskButtons.delete(name);
     pickActiveWindow();
+    config.onClose?.();
   }
 
   function enableDrag(name) {
@@ -200,16 +213,16 @@
       const { width } = viewport();
       const baseLeft = rect.left - positions[name].x;
       const baseTop = rect.top - positions[name].y;
-      const fullyFitsX = rect.width <= width - 16;
       const fullyFitsY = rect.height <= dockTop() - 14;
       drag = {
         x: event.clientX,
         y: event.clientY,
+        dockDropDistance: window.ZumaDockDrop.distance(rect, dockTop()),
         startX: positions[name].x,
         startY: positions[name].y,
         moved: false,
-        minX: fullyFitsX ? 8 - baseLeft : 80 - rect.width - baseLeft,
-        maxX: fullyFitsX ? width - 8 - rect.width - baseLeft : width - 80 - baseLeft,
+        minX: -rect.width * .5 - baseLeft,
+        maxX: width - rect.width * .5 - baseLeft,
         minY: 6 - baseTop,
         maxY: fullyFitsY ? Math.max(90, dockTop() - 8 - rect.height - baseTop) : dockTop() - Math.min(35, rect.height) - baseTop
       };
@@ -223,7 +236,7 @@
       positions[name].x = Math.min(Math.max(drag.startX + event.clientX - drag.x, drag.minX), drag.maxX);
       positions[name].y = Math.min(Math.max(drag.startY + event.clientY - drag.y, drag.minY), drag.maxY);
       windowEl.style.transform = `translate3d(${positions[name].x}px, ${positions[name].y}px, 0)`;
-      const onDock = drag.moved && reachedDock(event, drag.y, windowEl);
+      const onDock = drag.moved && event.clientY - drag.y >= drag.dockDropDistance;
       dock.classList.toggle('is-drop-target', onDock);
       if (onDock) finishDrag(event, true);
     });
@@ -237,7 +250,7 @@
     };
     const stop = event => {
       if (!drag) return;
-      finishDrag(event, event.type === 'pointerup' && drag.moved && reachedDock(event, drag.y, windowEl));
+      finishDrag(event, event.type === 'pointerup' && drag.moved && event.clientY - drag.y >= drag.dockDropDistance);
     };
     titlebar.addEventListener('pointerup', stop);
     titlebar.addEventListener('pointercancel', stop);
@@ -358,13 +371,18 @@
 
   document.querySelector('#socials-trigger').addEventListener('click', () => {
     open('notice');
-    requestAnimationFrame(() => configs.notice.titlebar.focus());
   });
 
   window.ZumaWindowManager = {
     open,
     close,
     minimize,
+    activate,
+    setInputMode,
+    restoreFocus,
+    register(name, config) {
+      configs[name] = config;
+    },
     isActive: name => activeName === name && states.get(name) === 'open',
     resetPosition(name) {
       if (!positions[name]) return;
