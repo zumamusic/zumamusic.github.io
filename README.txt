@@ -12,8 +12,13 @@ Click the record player icon in the dock to open ZUMA Player. It starts with
 EQ, Playlist, and MilkDrop closed. Use EQ and PL in the player to open their
 panels, and click the black disc to toggle MilkDrop. Drag the small grip at the
 bottom right of the transport window to scale the player. Its audio and artwork
-are included in this folder. player-source/ contains the editable player source;
-run npm install and npm run build there to rebuild player/ after changes.
+are included in this folder. ../player-source/ contains the editable player
+source; run pnpm install and pnpm run build there to rebuild player/ after
+changes.
+
+The playlist has 14 bundled songs. Get Bent!.m4a is first. Each playlist title
+shows the clean song name and audio file extension; the matching audio files
+are in audio/.
 
 ARCHIVES
 Click the archive icon in the dock to open Archives. Click the Socials desktop
