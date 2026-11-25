@@ -40,7 +40,7 @@
   height: calc(var(--desktop-title-height) * .5);
 }
 .archives-titlebar h2 {
-  font: 400 clamp(14px, 4.6cqw, 18px)/1 Arial, sans-serif;
+  font: 400 clamp(14px, 4.6cqw, 18px)/1 "W95FA", monospace;
   letter-spacing: 0;
 }
 .archives-window-controls { gap: calc(var(--desktop-chrome-reference) * .006); }

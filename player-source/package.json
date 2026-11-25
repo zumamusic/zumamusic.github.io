@@ -1,0 +1,19 @@
+{
+  "name": "zuma-site-player",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build && cp globals.css eq-native.css window-native.css embedded.css ../dist/player/"
+  },
+  "dependencies": {
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "webamp": "2.3.1"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.0.13"
+  },
+  "packageManager": "pnpm@11.19.0"
+}

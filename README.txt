@@ -1,6 +1,6 @@
 ZUMA MUSIC WEBSITE PACKAGE
 
-This is the static Zuma site with the Contact, Socials, Archives, and ZUMA Player windows.
+This is the static Zuma site with the Contact, ZUMA, Archives, Shop, and ZUMA Player windows.
 Keep the entire folder together when deploying to GitHub Pages or another host.
 
 LOCAL PREVIEW
@@ -12,18 +12,13 @@ Click the record player icon in the dock to open ZUMA Player. It starts with
 EQ, Playlist, and MilkDrop closed. Use EQ and PL in the player to open their
 panels, and click the black disc to toggle MilkDrop. Drag the small grip at the
 bottom right of the transport window to scale the player. Its audio and artwork
-are included in this folder. ../player-source/ contains the editable player
-source; run pnpm install and pnpm run build there to rebuild player/ after
-changes.
-
-The playlist has 14 bundled songs. Get Bent!.m4a is first. Each playlist title
-shows the clean song name and audio file extension; the matching audio files
-are in audio/.
+are included in this folder. player-source/ contains the editable player source;
+run npm install and npm run build there to rebuild player/ after changes.
 
 ARCHIVES
-Click the archive icon in the dock to open Archives. Click the Socials desktop
-icon to open the coming soon window. The tree currently
-contains Archives 1 with eight photos and one video. Open a thumbnail to use
+Click the archive icon in the dock to open Archives. Click the ZUMA Start button
+to open the coming soon window. The tree currently contains Archives 1 with
+eight photos and one video. Open a thumbnail to use
 the viewer; arrows and the filmstrip move between files. The video has a play
 button in the grid and native playback controls in the viewer.
 All three windows can be dragged by their title bars, resized from the bottom-

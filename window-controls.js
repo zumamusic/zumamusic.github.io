@@ -7,8 +7,8 @@
       layer: document.querySelector('#home'),
       titlebar: document.querySelector('#titlebar'),
       minimize: document.querySelector('#notice-minimize'),
-      restoreLabel: 'Socials',
-      taskIcon: 'zumapc.png'
+      restoreLabel: 'ZUMA',
+      taskIcon: 'notice-wave.png'
     },
     contact: {
       window: document.querySelector('.contact-window'),
@@ -16,7 +16,7 @@
       titlebar: document.querySelector('.contact-titlebar'),
       minimize: document.querySelector('#contact-minimize'),
       restoreLabel: 'Contact',
-      taskIcon: 'pixel-rainwave.png',
+      taskIcon: 'contact-rainwave-black.png',
       bodyClass: 'contact-is-open'
     },
     archives: {
@@ -27,15 +27,34 @@
       restoreLabel: 'Archives',
       taskIcon: 'dock-archives.png',
       bodyClass: 'archives-is-open'
+    },
+    shop: {
+      window: document.querySelector('#shop-window'),
+      layer: document.querySelector('#shop-layer'),
+      titlebar: document.querySelector('.shop-titlebar'),
+      minimize: document.querySelector('#shop-minimize'),
+      restoreLabel: 'Shop',
+      taskIcon: 'dock-shop.png'
     }
   };
-  const positions = { contact: { x: 0, y: 0 }, archives: { x: 0, y: 0 } };
+  const positions = { contact: { x: 0, y: 0 }, archives: { x: 0, y: 0 }, shop: { x: 0, y: 0 } };
   const states = new Map();
   const taskButtons = new Map();
+  const taskIcons = new Map();
   const animations = new Map();
   const zOrder = [];
   let activeName = null;
   let inputMode = 'pointer';
+
+  function preloadTaskIcon(name, config) {
+    const icon = new Image();
+    icon.alt = '';
+    icon.decoding = 'sync';
+    icon.src = config.taskIcon;
+    icon.decode?.().catch(() => {});
+    taskIcons.set(name, icon);
+  }
+  Object.entries(configs).forEach(([name, config]) => preloadTaskIcon(name, config));
 
   function setInputMode(mode) {
     inputMode = mode;
@@ -80,10 +99,8 @@
     if (taskButtons.has(name)) return taskButtons.get(name);
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'taskbar-window';
-    const icon = document.createElement('img');
-    icon.src = configs[name].taskIcon;
-    icon.alt = '';
+    button.className = `taskbar-window taskbar-window--${name}`;
+    const icon = taskIcons.get(name);
     const label = document.createElement('span');
     label.textContent = configs[name].restoreLabel;
     button.append(icon, label);
@@ -101,8 +118,8 @@
     if (!button) return;
     const left = button.offsetLeft;
     const right = left + button.offsetWidth;
-    if (left < taskList.scrollLeft) taskList.scrollTo({ left: left - 4, behavior: 'smooth' });
-    else if (right > taskList.scrollLeft + taskList.clientWidth) taskList.scrollTo({ left: right - taskList.clientWidth + 8, behavior: 'smooth' });
+    if (left < taskList.scrollLeft) taskList.scrollTo({ left: left - 4, behavior: 'auto' });
+    else if (right > taskList.scrollLeft + taskList.clientWidth) taskList.scrollTo({ left: right - taskList.clientWidth + 8, behavior: 'auto' });
   }
 
   function activate(name) {
@@ -168,7 +185,7 @@
     });
   }
 
-  function minimize(name) {
+  function minimize(name, { instant = false } = {}) {
     const config = configs[name];
     if (states.get(name) !== 'open') return;
     const keepKeyboardFocus = inputMode === 'keyboard';
@@ -179,7 +196,8 @@
     scrollTaskIntoView(name);
     states.set(name, 'minimized');
     pickActiveWindow();
-    animateWindow(name, 'out', () => {
+    if (instant) config.layer.hidden = true;
+    else animateWindow(name, 'out', () => {
       if (states.get(name) === 'minimized') config.layer.hidden = true;
     });
     if (keepKeyboardFocus) taskButtons.get(name)?.focus();
@@ -246,7 +264,7 @@
       drag = null;
       windowEl.classList.remove('is-dragging');
       dock.classList.remove('is-drop-target');
-      if (minimizeOnDock) minimize(name);
+      if (minimizeOnDock) minimize(name, { instant: true });
     };
     const stop = event => {
       if (!drag) return;
@@ -267,15 +285,40 @@
       if (event.button !== 0 || windowEl.classList.contains('is-maximized')) return;
       const rect = windowEl.getBoundingClientRect();
       start = { x: event.clientX, y: event.clientY, width: rect.width, height: rect.height, left: rect.left, top: rect.top };
+      if (name === 'shop') {
+        const view = viewport();
+        const ratio = 1669 / 1843;
+        const availableHeight = dockTop();
+        start.minWidth = Math.min(260, view.width - 24, availableHeight * ratio - 24);
+        start.maxWidth = Math.max(start.minWidth, Math.min(
+          view.width - Math.max(0, rect.left) - 8,
+          (availableHeight - Math.max(0, rect.top) - 8) * ratio
+        ));
+        start.positionX = positions.shop.x;
+        start.positionY = positions.shop.y;
+      }
       handle.setPointerCapture(event.pointerId);
       windowEl.classList.add('is-resizing');
       event.preventDefault();
     });
     handle.addEventListener('pointermove', event => {
       if (!start || !handle.hasPointerCapture(event.pointerId)) return;
+      if (name === 'shop') {
+        const ratio = 1669 / 1843;
+        const horizontalChange = event.clientX - start.x;
+        const verticalChange = (event.clientY - start.y) * ratio;
+        const change = Math.abs(horizontalChange) >= Math.abs(verticalChange) ? horizontalChange : verticalChange;
+        const width = Math.min(start.maxWidth, Math.max(start.minWidth, start.width + change));
+        const height = width / ratio;
+        windowEl.style.width = `${width}px`;
+        positions.shop.x = start.positionX + (width - start.width) / 2;
+        positions.shop.y = start.positionY + (height - start.height) / 2;
+        windowEl.style.transform = `translate3d(${positions.shop.x}px, ${positions.shop.y}px, 0)`;
+        return;
+      }
       const view = viewport();
-      if (name === 'contact') {
-        const ratio = 1519 / 1404;
+      if (name === 'contact' || name === 'notice') {
+        const ratio = name === 'notice' ? 2250 / 1164 : 1519 / 1404;
         const horizontalChange = event.clientX - start.x;
         const verticalChange = (event.clientY - start.y) * ratio;
         const change = Math.abs(horizontalChange) >= Math.abs(verticalChange) ? horizontalChange : verticalChange;
@@ -330,6 +373,27 @@
     contactMaximize.setAttribute('aria-label', maximized ? 'Restore contact window size' : 'Maximize contact window');
   });
 
+  for (const [name, buttonId] of [['notice', 'notice-maximize'], ['shop', 'shop-maximize']]) {
+    const button = document.querySelector(`#${buttonId}`);
+    button.addEventListener('click', () => {
+      const maximized = configs[name].window.classList.toggle('is-maximized');
+      button.setAttribute('aria-label', `${maximized ? 'Restore' : 'Maximize'} ${configs[name].restoreLabel} window${maximized ? ' size' : ''}`);
+    });
+  }
+
+  document.querySelector('#notice-close').addEventListener('click', () => {
+    configs.notice.window.classList.remove('is-maximized');
+    document.querySelector('#notice-maximize').setAttribute('aria-label', 'Maximize ZUMA window');
+    close('notice');
+    restoreFocus(document.querySelector('#dock-start-trigger'));
+  });
+  document.querySelector('#shop-close').addEventListener('click', () => {
+    configs.shop.window.classList.remove('is-maximized');
+    document.querySelector('#shop-maximize').setAttribute('aria-label', 'Maximize Shop window');
+    close('shop');
+    restoreFocus(document.querySelector('#dock-shop-trigger'));
+  });
+
   let mouseDrag = null;
   let suppressClick = false;
   taskList.addEventListener('pointerdown', event => {
@@ -369,8 +433,11 @@
     taskList.scrollBy({ left: event.key === 'ArrowRight' ? 120 : -120, behavior: 'smooth' });
   });
 
-  document.querySelector('#socials-trigger').addEventListener('click', () => {
+  document.querySelector('#dock-start-trigger').addEventListener('click', () => {
     open('notice');
+  });
+  document.querySelector('#dock-shop-trigger').addEventListener('click', () => {
+    open('shop');
   });
 
   window.ZumaWindowManager = {
@@ -382,6 +449,7 @@
     restoreFocus,
     register(name, config) {
       configs[name] = config;
+      preloadTaskIcon(name, config);
     },
     isActive: name => activeName === name && states.get(name) === 'open',
     resetPosition(name) {

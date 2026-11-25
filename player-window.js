@@ -62,7 +62,7 @@
       trigger.setAttribute('aria-busy', 'true');
       clearTimeout(startupTimer);
       startupTimer = setTimeout(failStartup, 20000);
-      frame.src = `player/index.html?v=20261017-dock&session=${session}`;
+      frame.src = `player/index.html?v=20261123-playlist-no-select&session=${session}`;
     } else refreshBounds();
   }
 
@@ -93,10 +93,12 @@
         const style = view.getComputedStyle(panel);
         const rect = panel.getBoundingClientRect();
         if (!rect.width || !rect.height || style.visibility === 'hidden' || style.display === 'none') return;
-        const left = Math.floor(rect.left);
-        const top = Math.floor(rect.top);
-        const right = Math.ceil(rect.right);
-        const bottom = Math.ceil(rect.bottom);
+        // The compact view's soft shadow extends beyond its element bounds.
+        const shadowRoom = panel.matches?.('.zuma-mini-player') ? 18 : 0;
+        const left = Math.floor(rect.left - shadowRoom);
+        const top = Math.floor(rect.top - shadowRoom);
+        const right = Math.ceil(rect.right + shadowRoom);
+        const bottom = Math.ceil(rect.bottom + shadowRoom);
         paths.push(`M${left} ${top}H${right}V${bottom}H${left}Z`);
       });
       const path = gesture ? 'none' : paths.length ? `path('${paths.join(' ')}')` : 'inset(50%)';
@@ -146,7 +148,7 @@
       drag.title.dispatchEvent(new view.PointerEvent('pointercancel', { bubbles: true, pointerId: event.pointerId, pointerType: event.pointerType }));
       if (drag.title.hasPointerCapture?.(event.pointerId)) drag.title.releasePointerCapture(event.pointerId);
       view.dispatchEvent(new view.MouseEvent('mouseup', { bubbles: true }));
-      manager.minimize('player');
+      manager.minimize('player', { instant: true });
     }
     function frameMove(event) { trackDockDrag(event); }
     function hostMove(event) { trackDockDrag(event, true); }

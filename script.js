@@ -41,7 +41,7 @@
 
   controls.addEventListener('pointerdown', event => event.stopPropagation());
   titlebar.addEventListener('pointerdown', event => {
-    if (event.button !== 0 || event.target.closest('.mini-controls')) return;
+    if (event.button !== 0 || event.target.closest('.mini-controls') || notice.classList.contains('is-maximized')) return;
     const rect = notice.getBoundingClientRect();
     const viewport = viewportSize();
     const baseLeft = rect.left - position.x;
@@ -81,7 +81,7 @@
     drag = null;
     notice.classList.remove('is-dragging');
     dock.classList.remove('is-drop-target');
-    if (minimizeOnDock) window.ZumaWindowManager?.minimize('notice');
+    if (minimizeOnDock) window.ZumaWindowManager?.minimize('notice', { instant: true });
   }
   function stop(event) {
     if (!drag) return;
@@ -124,12 +124,16 @@
   const contactStatus = document.querySelector('#contact-status');
   const contactThankyou = document.querySelector('#contact-thankyou');
   const contactSubmit = contactForm.querySelector('[type="submit"]');
+  let contactSubmission = null;
 
   function openContact() {
     window.ZumaWindowManager?.open('contact');
   }
 
   function closeContact() {
+    contactSubmission?.abort();
+    contactSubmission = null;
+    contactSubmit.disabled = false;
     if (contactWindow.classList.contains('is-sent')) contactForm.reset();
     contactWindow.classList.remove('is-sent');
     contactThankyou.hidden = true;
@@ -155,26 +159,42 @@
 
   contactForm.addEventListener('submit', async event => {
     event.preventDefault();
-    if (!contactForm.reportValidity()) return;
+    if (contactSubmission || !contactForm.reportValidity()) return;
     contactStatus.className = 'contact-status';
     contactStatus.textContent = 'Sending…';
     contactSubmit.disabled = true;
+    const controller = new AbortController();
+    contactSubmission = controller;
+    const slowNotice = setTimeout(() => {
+      if (contactSubmission === controller) contactStatus.textContent = 'Still sending…';
+    }, 8000);
+    const deadline = setTimeout(() => controller.abort(), 30000);
     try {
       const response = await fetch(contactForm.action, {
         method: 'POST',
         headers: { Accept: 'application/json' },
-        body: new FormData(contactForm)
+        body: new FormData(contactForm),
+        signal: controller.signal
       });
+      if (contactSubmission !== controller) return;
       if (!response.ok) throw new Error('Message could not be sent');
       contactForm.reset();
       contactStatus.textContent = '';
       contactWindow.classList.add('is-sent');
       contactThankyou.hidden = false;
     } catch (error) {
+      if (contactSubmission !== controller) return;
       contactStatus.classList.add('is-error');
-      contactStatus.innerHTML = 'Couldn\u2019t send. Email <a href="mailto:demos@zuma.music">demos@zuma.music</a>.';
+      contactStatus.innerHTML = error.name === 'AbortError'
+        ? 'No confirmation yet. Check inbox before retrying.'
+        : 'Couldn\u2019t send. Email <a href="mailto:demos@zuma.music">demos@zuma.music</a>.';
     } finally {
-      contactSubmit.disabled = false;
+      clearTimeout(slowNotice);
+      clearTimeout(deadline);
+      if (contactSubmission === controller) {
+        contactSubmission = null;
+        contactSubmit.disabled = false;
+      }
     }
   });
 
